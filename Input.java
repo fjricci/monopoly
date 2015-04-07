@@ -31,7 +31,11 @@ public class Input {
                 System.out.println("Please enter a valid integer.");
                 continue;
             }
-            break;
+
+            if (roll.val < 1 || roll.val > 6)
+                System.out.println("Please enter a valid die value.");
+            else
+                break;
         }
 
         while (true) {
@@ -43,7 +47,12 @@ public class Input {
                 continue;
             }
 
-            roll.is_double = second_val == roll.val;
+            if (second_val < 1 || second_val > 6) {
+                System.out.println("Please enter a valid die value.");
+                continue;
+            }
+
+            roll.is_double = (second_val == roll.val);
             roll.val += second_val;
 
             return roll;

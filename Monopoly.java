@@ -1,32 +1,34 @@
-/******************************************************************************
- * 
- *  Author: Francis Ricci
- *  File: Monopoly.java
- *  
- *  Source code file dependencies:
- *      Board.java
- *      Card.java
- *      Cards.java
- *      Deck.java
- *      ProbDice.java
- *      Inactive.java
- *      Jail.java
- *      Player.java
- *      Prob.java
- *      Property.java
- *      Railroad.java
- *      Shuffle.java
- *      Square.java
- *      Taxes.java
- *      Utility.java
- *  
- *  Execution:
- *      monopoly.Monopoly N
- *      
- *  Purpose:
- *      Run a text-based Monopoly game emulator, with N human players.
- * 
- *****************************************************************************/
+/**
+ * ***************************************************************************
+ * <p>
+ * Author: Francis Ricci
+ * File: Monopoly.java
+ * <p>
+ * Source code file dependencies:
+ * Board.java
+ * Card.java
+ * Cards.java
+ * Deck.java
+ * ProbDice.java
+ * Inactive.java
+ * Jail.java
+ * Player.java
+ * Prob.java
+ * Property.java
+ * Railroad.java
+ * Shuffle.java
+ * Square.java
+ * Taxes.java
+ * Utility.java
+ * <p>
+ * Execution:
+ * monopoly.Monopoly N
+ * <p>
+ * Purpose:
+ * Run a text-based Monopoly game emulator, with N human players.
+ * <p>
+ * ***************************************************************************
+ */
 
 package monopoly;
 
@@ -43,10 +45,10 @@ import static monopoly.Input.inputDecision;
 
 public class Monopoly
 {
-	private Dice dice; //two six-sided dice
-	private Board board; //game board
+    private Dice dice; //two six-sided dice
+    private Board board; //game board
     private Scanner input;
-	private Queue<Player> players;
+    private Queue<Player> players;
     private final boolean deterministic;
 
     public Monopoly(){
@@ -67,8 +69,16 @@ public class Monopoly
     public void run(){
         while (players.size() > 1)
         {
+            try{
             players.forEach(this::turn);
+            }
+            catch (Exception e){
+            System.out.println("Early Termination initiated.");
+            return;
+            }
+            finally{
             printState();
+            }
         }
 
         Player winner = players.remove();
@@ -80,7 +90,9 @@ public class Monopoly
         System.out.println();
         System.out.println("THE WINNER IS " + winner.getName() + "!!!");
         System.out.println();
-        System.out.println();
+        Syst
+
+	t.println();
         System.out.println();
         System.out.println("////////////////////////////////////////");
         System.out.println("----------------------------------------");
@@ -105,6 +117,9 @@ public class Monopoly
             Player player = new Player(type, name);
             players.add(player);
         }
+
+        if (deterministic)
+            return;
 
         boolean tie = true;
         boolean[] ties = new boolean[N];
@@ -268,8 +283,7 @@ public class Monopoly
         }
     }
 
-    private void buyProp(Player player, Property prop, Square square)
-    {
+    private void buyProp(Player player, Property prop, Square square) {
         int cost = prop.cost();
         boolean additional = false;
         System.out.println("Would you like to purchase " + square.getName() + " for " + cost + " (Yes/No)?");
@@ -305,7 +319,7 @@ public class Monopoly
         }
         else
             //TODO case where property is not purchased by player
-            ;
+            return;
     }
     
     private void buyRail(Player player, Railroad rail, Square square)
@@ -730,7 +744,9 @@ public class Monopoly
                 System.out.printf("%40s%n", s.getName());
             System.out.println("----------------------------------------");
         }
-	}	public static void main(String[] args)
+	}
+
+	public static void main(String[] args)
 	{
         Monopoly monopoly = new Monopoly();
         monopoly.run();

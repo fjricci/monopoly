@@ -1,13 +1,15 @@
 package monopoly;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class Deck
 {
+	private final int SIZE; //store number of cards
 	private Card[] deck; //store array of cards
 	private int current;  //store current card
-	private final int SIZE; //store number of cards
 	
 	//create shuffled deck of cards
 	public Deck(Card[] cards)
@@ -16,7 +18,7 @@ public class Deck
 		deck = new Card[SIZE];
 		for (int i = 0; i < SIZE; i++)
 			 deck[i] = cards[i];
-		Shuffle.shuffle(deck);
+		Collections.shuffle(Arrays.asList(deck));
 	}
 
 	//draw next card from deck
@@ -24,7 +26,7 @@ public class Deck
 	{
 		if (current == SIZE)
 		{
-			Shuffle.shuffle(deck);
+			Collections.shuffle(Arrays.asList(deck));
 			current = 0;
 		}
 		return deck[current++];
