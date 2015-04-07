@@ -2,17 +2,11 @@ package monopoly;
 
 public class Square
 {
-    public enum SquareType
-    {
-        JAIL, TAXES, CARDS, PROPERTY, RAILROAD, UTILITY, INACTIVE
-    }
-
 	private String name;
 	private int position;
 	private Object square;
 	private boolean ownable;
 	private SquareType type;
-	
 	public Square(int position)
 	{
 		this.position = position;
@@ -106,7 +100,7 @@ public class Square
 	{
 	    return position;
 	}
-	
+
 	private void luxury()
 	{
 		name = "Luxury Tax";
@@ -227,7 +221,7 @@ public class Square
 		ownable = true;
         type = SquareType.PROPERTY;
 	}
-	
+
 	private void baltic()
 	{
 		name = "Baltic Avenue";
@@ -295,7 +289,7 @@ public class Square
 		ownable = true;
         type = SquareType.PROPERTY;
 	}
-	
+
 	private void charles()
 	{
 		name = "St. Charles Place";
@@ -329,7 +323,7 @@ public class Square
 		ownable = true;
         type = SquareType.PROPERTY;
 	}
-	
+
 	private void virginia()
 	{
 		name = "Virginia Avenue";
@@ -550,7 +544,7 @@ public class Square
 		ownable = true;
         type = SquareType.PROPERTY;
 	}
-	
+
 	private void park()
 	{
 		name = "Park Place";
@@ -584,7 +578,7 @@ public class Square
 		ownable = true;
         type = SquareType.PROPERTY;
 	}
-	
+
 	private void parking()
 	{
 		name = "Free Parking";
@@ -601,8 +595,7 @@ public class Square
 	//return square defensively
 	public Object square()
 	{
-		Object newSquare = new Object();
-		newSquare = square;
+		Object newSquare = square;
 		return newSquare;
 	}
 	
@@ -636,8 +629,8 @@ public class Square
                         break;
         default:        break;
 	    }
-	    
-	    return owned;
+
+		return owned;
 	}
 	
 	public SquareType type()
@@ -649,10 +642,9 @@ public class Square
 	{
 	    String string = name;
 	    string = string.concat("\n" + "Position: " + position);
-	    
-	    switch (type)
-	    {
-	    case JAIL:      break;
+
+		switch (type) {
+			case JAIL:      break;
 	    case TAXES:	    break;
 	    case CARDS:	    break;
         case INACTIVE:  break;
@@ -664,8 +656,8 @@ public class Square
 	    break;
 	    default:        break;
 	    }
-	    
-	    return string;
+
+		return string;
 	}
 	
 	private String propString()
@@ -696,5 +688,9 @@ public class Square
         String string = "Owned by ";
         string = string.concat(util.owner().toString());
         return string;
+	}
+
+	public enum SquareType {
+		JAIL, TAXES, CARDS, PROPERTY, RAILROAD, UTILITY, INACTIVE
 	}
 }
