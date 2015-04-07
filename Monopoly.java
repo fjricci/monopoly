@@ -43,8 +43,8 @@ public class Monopoly
 	private Dice dice; //two six-sided dice
 	private Board board; //game board
     private Scanner input;
-	
 	private Queue<Player> players;
+    private boolean deterministic;
 
     public Monopoly(){
         dice = new Dice(2, 6); //two dice, six sided
@@ -58,7 +58,8 @@ public class Monopoly
     public void run(){
         while (players.size() > 1)
         {
-            players.stream().filter(player -> !turn(player)).forEach(players::remove);
+            for (Player player : players)
+                turn(player);
             printState();
         }
 
@@ -77,81 +78,75 @@ public class Monopoly
         System.out.println("----------------------------------------");
     }
 		
-	private void initialize()
-	{
+	private void initialize() {
+        System.out.println("Would you like to provide your own dice and card input?");
+        deterministic = Input.inputBool(input);
+
         int N = 0;
         System.out.println("How many players?");
         while (N == 0) {
-            N = input.nextInt();
-            if (N < 2 || N > 8){
+            N = Integer.parseInt(input.nextLine());
+            if (N < 2 || N > 8) {
                 System.out.println("Must have between 2 and 8 players. Please try again.");
                 N = 0;
             }
         }
 
-		int[] order = new int[N];
-		for (int i = 0; i < N; i++)
-		{
-		    System.out.println("Player " + (i + 1) + " name?");
+        int[] order = new int[N];
+        for (int i = 0; i < N; i++) {
+            System.out.println("Player " + (i + 1) + " name?");
             String name = input.nextLine();
-		    Player.PlayerType type = Player.PlayerType.values()[i];
-		    Player player = new Player(type, name);
-		    players.add(player);
-		}
-		
+            Player.PlayerType type = Player.PlayerType.values()[i];
+            Player player = new Player(type, name);
+            players.add(player);
+        }
+
         boolean tie = true;
         boolean[] ties = new boolean[N];
         for (int i = 0; i < N; i++)
             ties[i] = true;
         int first = -1;
-        
-        while (tie)
-        {
-            for (int i = 0; i < N; i++)
-            {
+
+        while (tie) {
+            for (int i = 0; i < N; i++) {
                 if (ties[i])
                     order[i] = dice.roll();
             }
-            
+
             int maxRoll = 0;
-            
-            for (int i = 0; i < N; i++)
-            {
-                if (ties[i])
-                {
-                    if (order[i] > maxRoll)
-                    {
+
+            for (int i = 0; i < N; i++) {
+                if (ties[i]) {
+                    if (order[i] > maxRoll) {
                         maxRoll = order[i];
                         first = i;
                     }
                 }
             }
-            
+
             tie = false;
             for (int i = 0; i < N; i++)
                 ties[i] = false;
-            
-            for (int i = 0; i < N; i++)
-            {
-                if (order[i] == maxRoll && i != first)
-                {
+
+            for (int i = 0; i < N; i++) {
+                if (order[i] == maxRoll && i != first) {
                     ties[i] = true;
                     tie = true;
                 }
             }
         }
-        
-        Queue<Player> tempPlayers = new LinkedList<Player>();
-		for (int i = 0; i < first; i++)
-		    tempPlayers.add(players.remove());
-		
-		while (!tempPlayers.isEmpty())
-		    players.add(tempPlayers.remove());
-		
-		printState();
-	}
 
-    private boolean turn(Player player)
+        Queue<Player> tempPlayers = new LinkedList<Player>();
+        for (int i = 0; i < first; i++)
+            tempPlayers.add(players.remove());
+
+        while (!tempPlayers.isEmpty())
+            players.add(tempPlayers.remove());
+
+        printState();
+    }
+
+    private void turn(Player player)
     {
         System.out.println("It's " + player.getName() + "'s turn");
         int[] rolls = dice.rollDouble();
@@ -237,7 +232,6 @@ public class Monopoly
             }
         }
         System.out.println();
-        return true;
     }
 
     private void leaveJail(Player player)
@@ -275,17 +269,14 @@ public class Monopoly
     {
         int cost = prop.cost();
         boolean additional = false;
-        System.out.println("Would you like to purchase " + square.getName() +
-                                 " for " + cost + " (Yes/No)?");
+        System.out.println("Would you like to purchase " + square.getName() + " for " + cost + " (Yes/No)?");
         if (player.getMoney() < cost)
         {
             additional = true;
-            System.out.println("This transaction will require "
-                                                       + "additional funds.");
+            System.out.println("This transaction will require additional funds.");
         }
-        
-        String string = input.nextLine();
-        if (string.equals("Yes") || string.equals("yes"))
+
+        if (Input.inputBool(input))
         {
             if (!additional)
             {
@@ -309,29 +300,23 @@ public class Monopoly
                 }
             }
         }
-        else if (string.equals("No") || string.equals("no"))
+        else
             //TODO case where property is not purchased by player
             ;
-        else
-            throw new IllegalArgumentException("Must respond Yes or No!");
     }
     
     private void buyRail(Player player, Railroad rail, Square square)
     {
         int cost = rail.cost();
         boolean additional = false;
-        System.out.println("Would you like to purchase " + square.getName() +
-                                 " for " + cost + " (Yes/No)?");
+        System.out.println("Would you like to purchase " + square.getName() + " for " + cost + " (Yes/No)?");
         if (player.getMoney() < cost)
         {
             additional = true;
-            System.out.println("This transaction will require"
-                                                     + " additional funds.");
+            System.out.println("This transaction will require additional funds.");
         }
-        
-        String string = input.nextLine();
-        
-        if (string.equals("Yes") || string.equals("yes"))
+
+        if (Input.inputBool(input))
         {
             if (!additional)
             {
@@ -355,29 +340,23 @@ public class Monopoly
                 }
             }
         }
-        else if (string.equals("No") || string.equals("no"))
+        else
             //TODO case where property is not purchased by player
             ;
-        else
-            throw new IllegalArgumentException("Must respond Yes or No!");
     }
     
     private void buyUtil(Player player, Utility util, Square square)
     {
         int cost = util.cost();
         boolean additional = false;
-        System.out.println("Would you like to purchase " + square.getName() +
-                                 " for " + cost + " (Yes/No)?");
+        System.out.println("Would you like to purchase " + square.getName() + " for " + cost + " (Yes/No)?");
         if (player.getMoney() < cost)
         {
             additional = true;
-            System.out.println("This transaction will require"
-                                                     + " additional funds.");
+            System.out.println("This transaction will require additional funds.");
         }
-        
-        String string = input.nextLine();
-        
-        if (string.equals("Yes") || string.equals("yes"))
+
+        if (Input.inputBool(input))
         {
             if (!additional)
             {
@@ -401,11 +380,9 @@ public class Monopoly
                 }
             }
         }
-        else if (string.equals("No") || string.equals("no"))
+        else
             //TODO case where property is not purchased by player
             ;
-        else
-            throw new IllegalArgumentException("Must respond Yes or No!");
     }
     
     private void payProp(Player player, Property prop, Square square)
@@ -415,13 +392,11 @@ public class Monopoly
         if (player.getPlayer() == owner.getPlayer())
             return;
         boolean additional = false;
-        System.out.println("You have landed on " + square.getName() +
-                                 " and owe " + cost + " in rent.");
+        System.out.println("You have landed on " + square.getName() + " and owe " + cost + " in rent.");
         if (player.getMoney() < cost)
         {
             additional = true;
-            System.out.println("This transaction will require"
-                                                  + " additional funds.");
+            System.out.println("This transaction will require additional funds.");
         }
         
         if (!additional)
@@ -716,7 +691,7 @@ public class Monopoly
                     System.out.println(counter++ + ") " + sq.getName());
                 }
                 
-                int propNum = input.nextInt();
+                int propNum = Integer.parseInt(input.nextLine());
                 int propState = 1;
                 
                 for (Square sq : props)
@@ -767,13 +742,7 @@ public class Monopoly
             player.useJailFree();
             owner.addJailFree();
         }
-        Queue<Player> temp = new LinkedList<Player>();
-        for (Player p : players)
-        {
-            if (p.getPlayer() != player.getPlayer())
-                temp.add(p);                
-        }
-        players = temp;
+        players.remove(player);
     }
     
 	private void printState()
@@ -802,7 +771,7 @@ public class Monopoly
 
 	public static void main(String[] args)
 	{
-        Monopoly mono = new Monopoly();
-        mono.run();
+        Monopoly monopoly = new Monopoly();
+        monopoly.run();
 	}
 }
