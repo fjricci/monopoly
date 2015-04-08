@@ -1,7 +1,6 @@
 package monopoly;
 
-public class Taxes
-{
+public class Taxes implements SquareIf {
 	private int fixTax;  //fixed tax cost
 	private double varTax;  //percentage tax rate for variable tax
 
@@ -33,5 +32,20 @@ public class Taxes
 			return fixTax;
 		double percent = varTax / 100;
 		return (int) (value*percent);
+	}
+
+	public int cost() {
+		return 0;
+	}
+
+	public void purchase(Player player) {
+	}
+
+	public int rent(int val) {
+		return 0;
+	}
+
+	public Player owner() {
+		return null;
 	}
 }

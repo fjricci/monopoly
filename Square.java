@@ -4,9 +4,10 @@ public class Square
 {
 	private String name;
 	private int position;
-	private Object square;
+	private SquareIf square;
 	private boolean ownable;
 	private SquareType type;
+
 	public Square(int position)
 	{
 		this.position = position;
@@ -593,10 +594,9 @@ public class Square
 	}
 	
 	//return square defensively
-	public Object square()
+	public SquareIf square()
 	{
-		Object newSquare = square;
-		return newSquare;
+		return square;
 	}
 	
 	public String getName()

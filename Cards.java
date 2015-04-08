@@ -2,10 +2,9 @@ package monopoly;
 
 import java.util.Queue;
 
-public class Cards
-{
-	private Deck deck; //store deck of cards
+public class Cards implements SquareIf {
 	private final int DECK_SIZE = 16; //16 cards in either type of deck
+	private Deck deck; //store deck of cards
 	
 	//construct square of type cards
 	public Cards(Card.CardType type)
@@ -57,5 +56,20 @@ public class Cards
 	public int size()
 	{
 	    return DECK_SIZE;
+	}
+
+	public int cost() {
+		return 0;
+	}
+
+	public void purchase(Player player) {
+	}
+
+	public int rent(int val) {
+		return 0;
+	}
+
+	public Player owner() {
+		return null;
 	}
 }

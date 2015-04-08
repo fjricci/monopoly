@@ -45,11 +45,11 @@ import static monopoly.Input.inputDecision;
 
 public class Monopoly
 {
+    private final boolean deterministic;
     private Dice dice; //two six-sided dice
     private Board board; //game board
     private Scanner input;
     private Queue<Player> players;
-    private final boolean deterministic;
 
     public Monopoly(){
         board = new Board(); //create new board
@@ -64,6 +64,11 @@ public class Monopoly
             dice = new ProbDice(); //two dice, six sided
 
         initialize();
+    }
+
+    public static void main(String[] args) {
+        Monopoly monopoly = new Monopoly();
+        monopoly.run();
     }
 
     public void run(){
@@ -90,14 +95,12 @@ public class Monopoly
         System.out.println();
         System.out.println("THE WINNER IS " + winner.getName() + "!!!");
         System.out.println();
-        Syst
-
-	t.println();
+        System.out.println();
         System.out.println();
         System.out.println("////////////////////////////////////////");
         System.out.println("----------------------------------------");
     }
-		
+
 	private void initialize() {
         int N = 0;
         System.out.println("How many players?");
@@ -205,32 +208,11 @@ public class Monopoly
             System.out.println(" and landed on " + square[pos].getName());
             boolean owned = square[pos].isOwned();
             boolean ownable = square[pos].ownable();
+
             if (!owned && ownable)
-            {
-                switch (square[pos].type())
-                {
-                case PROPERTY: buyProp(player, (Property) square[pos].square(), square[pos]);
-                break;
-                case RAILROAD: buyRail(player, (Railroad) square[pos].square(), square[pos]);
-                break;
-                case UTILITY: buyUtil(player, (Utility) square[pos].square(), square[pos]);
-                break;
-                default: break;
-                }
-            }
+                unowned(player, square[pos]);
             else if (ownable)
-            {
-                switch (square[pos].type())
-                {
-                case PROPERTY: payProp(player, (Property) square[pos].square(), square[pos]);
-                break;
-                case RAILROAD: payRail(player, (Railroad) square[pos].square(), square[pos]);
-                break;
-                case UTILITY: payUtil(player, (Utility) square[pos].square(), square[pos], roll.val);
-                break;
-                default: break;
-                }
-            }
+                owned(player, square[pos], roll.val);
             else
             {
                 switch(square[pos].type())
@@ -259,14 +241,11 @@ public class Monopoly
         {
             player.useJailFree();
             System.out.println("You used a Get Out Of Jail Free Card!");
-        }
-        else if (player.getMoney() >= JAIL_COST)
+        } else if (player.getMoney() >= JAIL_COST)
         {
             player.excMoney(JAIL_COST * -1);
             System.out.println("You paid 50 to get out of jail!");
-        }
-        else
-        {
+        } else {
             int cost = JAIL_COST;
             Player bank = new Player(PlayerType.BANK, "Bank");
             while (true)
@@ -283,74 +262,28 @@ public class Monopoly
         }
     }
 
-    private void buyProp(Player player, Property prop, Square square) {
-        int cost = prop.cost();
+    public void unowned(Player player, Square square) {
+        SquareIf squareIf = square.square();
+        int cost = squareIf.cost();
         boolean additional = false;
         System.out.println("Would you like to purchase " + square.getName() + " for " + cost + " (Yes/No)?");
-        if (player.getMoney() < cost)
-        {
+        if (player.getMoney() < cost) {
             additional = true;
             System.out.println("This transaction will require additional funds.");
         }
 
-        if (inputBool(input))
-        {
-            if (!additional)
-            {
-                player.excMoney(-1*cost);
+        if (inputBool(input)) {
+            if (!additional) {
+                player.excMoney(-1 * cost);
                 player.addProperty(square.getPos());
-                prop.purchase(player);
-            }
-            else
-            {
+                squareIf.purchase(player);
+            } else {
                 Player bank = new Player(PlayerType.BANK, "Bank");
-                while (true)
-                {
+                while (true) {
                     cost = additionalFunds(cost, player, bank);
                     if (cost == Integer.MIN_VALUE)
                         return;
-                    if (cost < 0)
-                    {
-                        player.excMoney(cost * -1);
-                        break;
-                    }
-                }
-            }
-        }
-        else
-            //TODO case where property is not purchased by player
-            return;
-    }
-    
-    private void buyRail(Player player, Railroad rail, Square square)
-    {
-        int cost = rail.cost();
-        boolean additional = false;
-        System.out.println("Would you like to purchase " + square.getName() + " for " + cost + " (Yes/No)?");
-        if (player.getMoney() < cost)
-        {
-            additional = true;
-            System.out.println("This transaction will require additional funds.");
-        }
-
-        if (inputBool(input))
-        {
-            if (!additional)
-            {
-                player.excMoney(-1*cost);
-                player.addProperty(square.getPos());
-                rail.purchase(player);
-            }
-            else
-            {
-                Player bank = new Player(PlayerType.BANK, "Bank");
-                while (true)
-                {
-                    cost = additionalFunds(cost, player, bank);
-                    if (cost == Integer.MIN_VALUE)
-                        return;
-                    if (cost < 0)
-                    {
+                    if (cost < 0) {
                         player.excMoney(cost * -1);
                         break;
                     }
@@ -362,148 +295,29 @@ public class Monopoly
             ;
     }
     
-    private void buyUtil(Player player, Utility util, Square square)
+    private void owned(Player player, Square square, int val)
     {
-        int cost = util.cost();
-        boolean additional = false;
-        System.out.println("Would you like to purchase " + square.getName() + " for " + cost + " (Yes/No)?");
-        if (player.getMoney() < cost)
-        {
-            additional = true;
-            System.out.println("This transaction will require additional funds.");
-        }
-
-        if (inputBool(input))
-        {
-            if (!additional)
-            {
-                player.excMoney(-1*cost);
-                player.addProperty(square.getPos());
-                util.purchase(player);
-            }
-            else
-            {
-                Player bank = new Player(PlayerType.BANK, "Bank");
-                while (true)
-                {
-                    cost = additionalFunds(cost, player, bank);
-                    if (cost == Integer.MIN_VALUE)
-                        return;
-                    if (cost < 0)
-                    {
-                        player.excMoney(cost * -1);
-                        break;
-                    }
-                }
-            }
-        }
-        else
-            //TODO case where property is not purchased by player
-            ;
-    }
-
-    private void payProp(Player player, Property prop, Square square)
-    {
-        int cost = prop.rent();
-        Player owner = prop.owner();
+        SquareIf squareIf = square.square();
+        int cost = squareIf.rent(val);
+        Player owner = squareIf.owner();
         if (player.getPlayer() == owner.getPlayer())
             return;
         boolean additional = false;
         System.out.println("You have landed on " + square.getName() + " and owe " + cost + " in rent.");
-        if (player.getMoney() < cost)
-        {
+        if (player.getMoney() < cost) {
             additional = true;
             System.out.println("This transaction will require additional funds.");
         }
 
-        if (!additional)
-        {
+        if (!additional) {
             player.excMoney(-1*cost);
             owner.excMoney(cost);
-        }
-        else
-        {
-            while (true)
-            {
+        } else {
+            while (true) {
                 cost = additionalFunds(cost, player, owner);
                 if (cost == Integer.MIN_VALUE)
                     return;
-                if (cost < 0)
-                {
-                    player.excMoney(cost * -1);
-                    break;
-                }
-            }
-        }
-    }
-  
-    private void payRail(Player player, Railroad rail, Square square)
-    {
-        int cost = rail.rent();
-        Player owner = rail.owner();
-        if (player.getPlayer() == owner.getPlayer())
-            return;
-        boolean additional = false;
-        System.out.println("You have landed on " + square.getName() +
-                                 " and owe " + cost + " in rent.");
-        if (player.getMoney() < cost)
-        {
-            additional = true;
-            System.out.println("This transaction will require"
-                                                  + " additional funds.");
-        }
-
-        if (!additional)
-        {
-            player.excMoney(-1*cost);
-            owner.excMoney(cost);
-        }
-        else
-        {
-            while (true)
-            {
-                cost = additionalFunds(cost, player, owner);
-                if (cost == Integer.MIN_VALUE)
-                    return;
-                if (cost < 0)
-                {
-                    player.excMoney(cost * -1);
-                    break;
-                }
-            }
-        }
-    }
-    
-    private void payUtil(Player player, Utility util, Square square, int roll)
-    {
-        int cost = util.rent(roll);
-        Player owner = util.owner();
-        if (player.getPlayer() == owner.getPlayer())
-            return;
-        boolean additional = false;
-        System.out.println("You have landed on " + square.getName() +
-                                 " and owe " + cost + " in rent.");
-        if (player.getMoney() < cost)
-        {
-            additional = true;
-            System.out.println("This transaction will require"
-                                               + " additional funds.");
-        }
-
-        if (!additional)
-        {
-            player.excMoney(-1*cost);
-            owner.excMoney(cost);
-        }
-        else
-        {
-            while (true)
-            {
-                cost = additionalFunds(cost, player, owner);
-                if (cost == Integer.MIN_VALUE)
-                    return;
-                if (cost < 0)
-                {
+                if (cost < 0) {
                     player.excMoney(cost * -1);
                     break;
                 }
@@ -551,7 +365,7 @@ public class Monopoly
             }
         }
     }
-    
+
     private void drawCard(Player player, Cards cards, Square square) {
         int numString = 3;
         Card card = cards.draw();
@@ -709,7 +523,7 @@ public class Monopoly
 
         return cost;
     }
-    
+
     private void lose(Player player, Player owner) {
         Queue<Integer> props = player.propIDs();
         Queue<Square> squares = player.properties();
@@ -744,11 +558,5 @@ public class Monopoly
                 System.out.printf("%40s%n", s.getName());
             System.out.println("----------------------------------------");
         }
-	}
-
-	public static void main(String[] args)
-	{
-        Monopoly monopoly = new Monopoly();
-        monopoly.run();
 	}
 }

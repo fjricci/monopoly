@@ -1,8 +1,7 @@
 package monopoly;
 
-public class Utility
-{
-	//rent multiplier, given number of utilities owned by a player
+public class Utility implements SquareIf {
+    //rent multiplier, given number of utilities owned by a player
 	private final int ONE = 4;
 	private final int TWO = 10;
 	private final int COST = 150; //cost to purchase utility
@@ -15,15 +14,13 @@ public class Utility
 	private boolean mortgaged; //is property mortgaged?
 	
 	//utility constructor
-	public Utility()
-	{
-		numOwned = 0;
+    public Utility() {
+        numOwned = 0;
 		mortgaged = false;
 	}
     
     //update status of property to owned
-    public void purchase(Player player)
-    {
+    public void purchase(Player player) {
         owned = true;
         owner = player;
         ownerType = player.getPlayer();
@@ -48,9 +45,8 @@ public class Utility
 	}
 	
 	//return rent on utility, given a roll
-	public int rent(int roll)
-	{
-		if (roll < 2 || roll > 12)
+    public int rent(int roll) {
+        if (roll < 2 || roll > 12)
 			throw new IllegalArgumentException("Invalid Roll!");
 		
 		switch(numOwned)
@@ -80,14 +76,12 @@ public class Utility
     }
 
     //return cost to purchase utility
-    public int cost()
-    {
+    public int cost() {
         return COST;
     }
     
     //mortgage property
-    public int mortgage()
-    {
+    public int mortgage() {
         if (mortgaged)
         {
             mortgaged = false;
@@ -99,14 +93,13 @@ public class Utility
             return COST / 2;
         }
     }
-    
-    public boolean isMortgaged()
-    {
+
+    public boolean isMortgaged() {
         return mortgaged;
-    }    
-    
-    public int mortgageCost()
-    {
+    }
+
+    public int mortgageCost() {
         return COST / 2;
     }
+
 }

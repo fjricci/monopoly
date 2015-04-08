@@ -1,7 +1,8 @@
 package monopoly;
 
-public class Property
-{
+import monopoly.Player.PlayerType;
+
+public class Property implements SquareIf {
 	//costs of rent for all possible property states
 	private int rent;
 	private int oneH;
@@ -17,7 +18,7 @@ public class Property
 	private boolean monopoly; //does one player own all properties in set?
 	private boolean owned;  //is property owned?
 	private boolean mortgaged; //is property mortgaged
-	private Player.PlayerType ownerType;
+	private PlayerType ownerType;
 	private Player owner;
 	
 	//construct property, given its rents
@@ -98,7 +99,7 @@ public class Property
 	}
 	
 	//return amount owed
-	public int rent()
+	public int rent(int val)
 	{
 		if (!owned)
 			return 0;
@@ -114,21 +115,18 @@ public class Property
 			default: return 0;
 		}
 	}
-    
-    public Player.PlayerType ownerType()
-    {
+
+	public PlayerType ownerType() {
         return ownerType;
     }
-    
-    public Player owner()
-    {
-        return owner;
+
+	public Player owner() {
+		return owner;
     }
 
     //mortgage property
-    public int mortgage()
-    {
-        if (mortgaged)
+	public int mortgage() {
+		if (mortgaged)
         {
             mortgaged = false;
             return (int) Math.round((value / 2) * 1.1);
@@ -139,14 +137,12 @@ public class Property
             return value / 2;
         }
     }
-    
-    public boolean isMortgaged()
-    {
-        return mortgaged;
+
+	public boolean isMortgaged() {
+		return mortgaged;
     }
-    
-    public int mortgageCost()
-    {
-        return value / 2;
+
+	public int mortgageCost() {
+		return value / 2;
     }
 }
