@@ -2,7 +2,7 @@ package monopoly;
 
 import monopoly.Player.PlayerType;
 
-public class Property implements SquareIf {
+public class Property implements Square {
 	//costs of rent for all possible property states
 	private int rent;
 	private int oneH;
@@ -20,10 +20,13 @@ public class Property implements SquareIf {
 	private boolean mortgaged; //is property mortgaged
 	private PlayerType ownerType;
 	private Player owner;
+
+	private int pos;
+	private String name;
 	
 	//construct property, given its rents
-	public Property(int rent, int oneH, int twoH, int threeH, int fourH,
-						int hotel, int value, int houses)
+	public Property(String name, int pos, int rent, int oneH, int twoH,
+	                int threeH, int fourH, int hotel, int value, int houses)
 	{
 		this.rent = rent;
 		this.oneH = oneH;
@@ -36,6 +39,21 @@ public class Property implements SquareIf {
 		buildings = 0;
 		monopoly = false;
 		owned = false;
+
+		this.pos = pos;
+		this.name = name;
+	}
+
+	public int position() {
+		return pos;
+	}
+
+	public String name() {
+		return name;
+	}
+
+	public boolean isOwnable() {
+		return true;
 	}
 	
 	//update status of property to owned

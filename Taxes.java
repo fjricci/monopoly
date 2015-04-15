@@ -1,23 +1,48 @@
 package monopoly;
 
-public class Taxes implements SquareIf {
+public class Taxes implements Square {
 	private int fixTax;  //fixed tax cost
 	private double varTax;  //percentage tax rate for variable tax
 
+	private String name;
+	private int pos;
+
 	//constructor if no variable tax option
-	public Taxes(int tax)
-	{
+	public Taxes(String name, int pos, int tax) {
 		fixTax = tax;
 		varTax = 0;
+		this.name = name;
+		this.pos = pos;
 	}
-	
+
 	//constructor with variable tax rate
-	public Taxes(int tax, int rate)
-	{
+	public Taxes(String name, int pos, int tax, int rate) {
 		fixTax = tax;
 		varTax = rate;
+		this.name = name;
+		this.pos = pos;
 	}
-	
+
+	public int position() {
+		return pos;
+	}
+
+	public String name() {
+		return name;
+	}
+
+	public boolean isOwnable() {
+		return false;
+	}
+
+	public boolean isMortgaged() {
+		return false;
+	}
+
+	public int mortgageCost() {
+		return 0;
+	}
+
 	//return fixed rate tax owed
 	public int tax()
 	{

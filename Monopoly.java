@@ -34,29 +34,24 @@ package monopoly;
 
 import monopoly.Jail.JailType;
 import monopoly.Player.PlayerType;
-import monopoly.Square.SquareType;
 
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Scanner;
-
-import static monopoly.Input.inputBool;
-import static monopoly.Input.inputDecision;
 
 public class Monopoly {
 	private final boolean deterministic;
 	private Dice dice; //two six-sided dice
 	private Board board; //game board
-	private Scanner input;
+	private Input input;
 	private Queue<Player> players;
 
 	public Monopoly() {
 		board = new Board(); //create new board
 		players = new LinkedList<>();
-		input = new Scanner(System.in);
+		input = new Input();
 
 		System.out.println("Would you like to provide your own dice and card input?");
-		deterministic = inputBool(input);
+		deterministic = input.inputBool();
 		if (deterministic)
 			dice = new InputDice(input);
 		else
@@ -101,7 +96,7 @@ public class Monopoly {
 		int N = 0;
 		System.out.println("How many players?");
 		while (N == 0) {
-			N = Integer.parseInt(input.nextLine());
+			N = input.inputInt();
 			if (N < 2 || N > 8) {
 				System.out.println("Must have between 2 and 8 players. Please try again.");
 				N = 0;
@@ -111,7 +106,7 @@ public class Monopoly {
 		int[] order = new int[N];
 		for (int i = 0; i < N; i++) {
 			System.out.println("Player " + (i + 1) + " name?");
-			String name = input.nextLine();
+			String name = input.inputString();
 			Player.PlayerType type = Player.PlayerType.values()[i];
 			Player player = new Player(type, name);
 			players.add(player);
@@ -197,7 +192,7 @@ public class Monopoly {
 			Square[] square = board.getBoard();
 			System.out.println(" and landed on " + square[pos].getName());
 			boolean owned = square[pos].isOwned();
-			boolean ownable = square[pos].ownable();
+			boolean ownable = square[pos].square().isOwnable();
 
 			if (!owned && ownable)
 				unowned(player, square[pos]);
@@ -251,21 +246,27 @@ public class Monopoly {
 	}
 
 	public void unowned(Player player, Square square) {
-		SquareIf squareIf = square.square();
+		Square squareIf = square.square();
 		int cost = squareIf.cost();
+
+		if (totalVal(availableAssets(player)) + player.getMoney() < cost) {
+			System.out.println("You cannot afford to purchase " + square.getName());
+			purchase(auction(player, square), square);
+			return;
+		}
+
 		boolean additional = false;
 		System.out.println("Would you like to purchase " + square.getName() + " for " + cost + " (Yes/No)?");
+
 		if (player.getMoney() < cost) {
 			additional = true;
 			System.out.println("This transaction will require additional funds.");
 		}
 
-		if (inputBool(input)) {
-			if (!additional) {
+		if (input.inputBool()) {
+			if (!additional)
 				player.excMoney(-1 * cost);
-				player.addProperty(square.getPos());
-				squareIf.purchase(player);
-			} else {
+			else {
 				Player bank = new Player(PlayerType.BANK, "Bank");
 				while (true) {
 					cost = additionalFunds(cost, player, bank);
@@ -277,12 +278,70 @@ public class Monopoly {
 					}
 				}
 			}
-		} //else
-		//auction(player, square); //TODO
+
+			purchase(player, square);
+		} else
+			purchase(auction(player, square), square);
+
+	}
+
+	private void purchase(Player player, Square square) {
+		if (player == null || square == null) return;
+
+		player.addProperty(square.getPos());
+		square.square().purchase(player);
+	}
+
+	private Player auction(Player player, Square square) {
+		System.out.println("Auctioning off " + square.getName() + ".");
+		int currentBid = -10;
+		final int BID_INCREMENT = 10;
+
+		int count = 0;
+		String[] names = new String[players.size() - 1];
+		for (Player p : players) {
+			if (!p.equals(player))
+				names[count++] = p.getName();
+		}
+
+		Player winner = null;
+		while (true) {
+			int minBid = currentBid + BID_INCREMENT;
+			System.out.println("Would anyone like to place a bid? Minimum bid: $" + minBid);
+			if (!input.inputBool())
+				break;
+
+			System.out.println("Select player name");
+			String name = names[input.inputDecision(names)];
+			for (Player p : players) {
+				if (p.getName().equals(name)) {
+					winner = p;
+					break;
+				}
+			}
+
+			System.out.println(winner.getName() + ", please enter your bid.");
+			int bid = input.inputInt();
+			if (bid < minBid) {
+				System.out.println("Bid is below minimum bid. Please try again.");
+				continue;
+			}
+
+			System.out.println("Bid accepted. Current highest bid - " + winner.getName() + " for $" + bid);
+			currentBid = bid;
+		}
+
+		if (winner != null) {
+			winner.excMoney(-1 * currentBid);
+			System.out.println(winner.getName() + " wins auction, for $" + currentBid);
+		} else
+			System.out.println("No player wins auction.");
+
+		return winner;
 	}
 
 	private void owned(Player player, Square square, int val) {
-		SquareIf squareIf = square.square();
+		Square squareIf = square.square();
 		int cost = squareIf.rent(val);
 		Player owner = squareIf.owner();
 		if (player.getPlayer() == owner.getPlayer())
@@ -314,7 +373,7 @@ public class Monopoly {
 		int cost;
 		if (square.getPos() == 4) {
 			System.out.println("Would you like to pay 10% or 200 (10%/200)?");
-			int choice = inputDecision(input, new String[]{"10%", "200"});
+			int choice = input.inputDecision(new String[]{"10%", "200"});
 			if (choice == 1)
 				cost = tax.tax(player.getAssets());
 			else
@@ -413,66 +472,17 @@ public class Monopoly {
 	}
 
 	private int additionalFunds(int cost, Player player, Player owner) {
-		int totalMoney = 0;
+		Queue<Square> props = availableAssets(player);
+		int availableAssets = totalVal(props) + player.getMoney();
 
-		Queue<Square> props = new LinkedList<>();
-		for (Square sq : player.properties()) {
-			SquareType type = sq.type();
-			switch (type) {
-				case PROPERTY:
-					Property prop = (Property) sq.square();
-					if (!prop.isMortgaged()) {
-						props.add(sq);
-						continue;
-					}
-					break;
-				case UTILITY:
-					Utility util = (Utility) sq.square();
-					if (util.isMortgaged()) {
-						props.add(sq);
-						continue;
-					}
-					break;
-				case RAILROAD:
-					Railroad rail = (Railroad) sq.square();
-					if (rail.isMortgaged()) {
-						props.add(sq);
-						continue;
-					}
-					break;
-				default:
-					break;
-			}
-		}
-		for (Square sq : props) {
-			SquareType type = sq.type();
-			switch (type) {
-				case PROPERTY:
-					Property prop = (Property) sq.square();
-					totalMoney += prop.mortgageCost();
-					totalMoney += prop.numHouses() * prop.houseCost();
-					break;
-				case UTILITY:
-					Utility util = (Utility) sq.square();
-					totalMoney += util.mortgageCost();
-					break;
-				case RAILROAD:
-					Railroad rail = (Railroad) sq.square();
-					totalMoney += rail.mortgageCost();
-					break;
-				default:
-					break;
-			}
-		}
-
-		if (totalMoney < cost) {
+		if (availableAssets < cost) {
 			lose(player, owner);
 			return Integer.MIN_VALUE;
 		} else {
 			System.out.println("You need additional funds!");
 			System.out.println("How will you obtain necessary funds (Mortgage/Sell Houses)?");
 
-			int choice = inputDecision(input, new String[]{"Mortgage", "Sell Houses"});
+			int choice = input.inputDecision(new String[]{"Mortgage", "Sell Houses"});
 
 			if (choice == 0) {
 				System.out.println("Which property would you like to mortgage?");
@@ -482,35 +492,41 @@ public class Monopoly {
 				for (Square sq : props)
 					System.out.println(counter++ + ") " + sq.getName());
 
-				int propNum = Integer.parseInt(input.nextLine());
+				int propNum = input.inputInt();
 				int propState = 1;
 
 				for (Square sq : props) {
-					if (propState++ == propNum) {
-						SquareType type = sq.type();
-						switch (type) {
-							case PROPERTY:
-								Property prop = (Property) sq.square();
-								cost -= prop.mortgage();
-								break;
-							case UTILITY:
-								Utility util = (Utility) sq.square();
-								cost -= util.mortgage();
-								break;
-							case RAILROAD:
-								Railroad rail = (Railroad) sq.square();
-								cost -= rail.mortgage();
-								break;
-							default:
-								break;
-						}
-					}
+					if (propState++ == propNum)
+						cost -= sq.mortgage();
 				}
 			} else
 				; //TODO case where sell houses
 		}
 
 		return cost;
+	}
+
+	private Queue<Square> availableAssets(Player player) {
+		Queue<Square> props = new LinkedList<>();
+		for (Square sq : player.properties()) {
+			Square property = sq.square();
+			if (property.isOwnable() && property.isMortgaged())
+				props.add(property);
+		}
+
+		return props;
+	}
+
+	private int totalVal(Queue<Square> props) {
+		int totalMoney = 0;
+		for (Square sq : props) {
+			totalMoney += sq.cost();
+			if (sq instanceof Property) {
+				Property prop = (Property) sq;
+				totalMoney += prop.numHouses() * prop.houseCost();
+			}
+		}
+		return totalMoney;
 	}
 
 	private void lose(Player loser, Player winner) {

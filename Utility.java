@@ -1,6 +1,6 @@
 package monopoly;
 
-public class Utility implements SquareIf {
+public class Utility implements Square {
     //rent multiplier, given number of utilities owned by a player
 	private final int ONE = 4;
 	private final int TWO = 10;
@@ -12,12 +12,29 @@ public class Utility implements SquareIf {
 	
 	private int numOwned; //number of utilities owned by a player
 	private boolean mortgaged; //is property mortgaged?
-	
+
+    private String name;
+    private int pos;
+
 	//utility constructor
-    public Utility() {
+    public Utility(String name, int pos) {
         numOwned = 0;
 		mortgaged = false;
-	}
+        this.name = name;
+        this.pos = pos;
+    }
+
+    public int position() {
+        return pos;
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public boolean isOwnable() {
+        return true;
+    }
     
     //update status of property to owned
     public void purchase(Player player) {

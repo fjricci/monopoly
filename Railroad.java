@@ -2,7 +2,7 @@ package monopoly;
 
 import static monopoly.Player.PlayerType;
 
-public class Railroad implements SquareIf {
+public class Railroad implements Square {
     //rent, given number of railroads owned by a player
     private final int ONE = 25;
     private final int TWO = 50;
@@ -15,9 +15,22 @@ public class Railroad implements SquareIf {
     private boolean owned;  //is property owned?
     private boolean mortgaged;
 
+    private String name;
+    private int pos;
+
     //constructor
-    public Railroad() {
+    public Railroad(String name, int pos) {
         numOwned = 1;
+        this.name = name;
+        this.pos = pos;
+    }
+
+    public int position() {
+        return pos;
+    }
+
+    public String name() {
+        return name;
     }
 
     //update status of property to owned
@@ -25,6 +38,10 @@ public class Railroad implements SquareIf {
         owned = true;
         owner = player;
         ownerType = player.getPlayer();
+    }
+
+    public boolean isOwnable() {
+        return true;
     }
 
     //update total number of railroads owned by a player

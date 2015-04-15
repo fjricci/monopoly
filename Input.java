@@ -6,13 +6,36 @@ import java.util.Scanner;
  * Created by fjricci on 4/7/2015.
  */
 public class Input {
-    public static boolean inputBool(Scanner scanner){
-        return Input.inputDecision(scanner, new String[]{"Yes", "No"}) == 0;
+    private Scanner scanner;
+
+    public Input() {
+        scanner = new Scanner(System.in);
     }
 
-    public static int inputDecision(Scanner scanner, String[] choices) {
+    public String inputString() {
+        return scanner.nextLine();
+    }
+
+    public boolean inputBool() {
+        return inputDecision(new String[]{"Yes", "No"}) == 0;
+    }
+
+    public int inputInt() {
         while (true) {
-            String input = scanner.nextLine();
+            int val;
+            try {
+                val = Integer.parseInt(inputString());
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid integer.");
+                continue;
+            }
+            return val;
+        }
+    }
+
+    public int inputDecision(String[] choices) {
+        while (true) {
+            String input = inputString();
             for (int i = 0; i < choices.length; i++) {
                 if (input.equalsIgnoreCase(choices[i]))
                     return i;
@@ -21,12 +44,12 @@ public class Input {
         }
     }
 
-    public static Dice.Roll inputRoll(Scanner scanner) {
+    public Dice.Roll inputRoll() {
         Dice.Roll roll = new Dice.Roll();
 
         while (true) {
             try {
-                roll.val = Integer.parseInt(scanner.nextLine());
+                roll.val = Integer.parseInt(inputString());
             } catch (NumberFormatException e) {
                 System.out.println("Please enter a valid integer.");
                 continue;
@@ -41,7 +64,7 @@ public class Input {
         while (true) {
             int second_val;
             try {
-                second_val = Integer.parseInt(scanner.nextLine());
+                second_val = Integer.parseInt(inputString());
             } catch (NumberFormatException e) {
                 System.out.println("Please enter a valid integer.");
                 continue;
