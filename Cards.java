@@ -43,6 +43,13 @@ public class Cards implements Square {
 		return name;
 	}
 
+	public boolean isOwned() {
+		return false;
+	}
+
+	public int mortgage() {
+		return 0;
+	}
 	//create deck of community chest cards
 	private void community()
 	{

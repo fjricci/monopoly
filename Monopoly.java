@@ -84,7 +84,7 @@ public class Monopoly {
 		System.out.println();
 		System.out.println();
 		System.out.println();
-		System.out.println("THE WINNER IS " + winner.getName() + "!!!");
+		System.out.println("THE WINNER IS " + winner.name() + "!!!");
 		System.out.println();
 		System.out.println();
 		System.out.println();
@@ -161,7 +161,7 @@ public class Monopoly {
 	}
 
 	private void turn(Player player) {
-		System.out.println("It's " + player.getName() + "'s turn");
+		System.out.println("It's " + player.name() + "'s turn");
 		int double_count = 0;
 		while (true) {
 			Dice.Roll roll = dice.roll();
@@ -188,33 +188,22 @@ public class Monopoly {
 			System.out.print("You rolled a " + roll.val);
 			if (roll.is_double)
 				System.out.print(" (double)");
-			int pos = player.getPos();
+			int pos = player.position();
 			Square[] square = board.getBoard();
-			System.out.println(" and landed on " + square[pos].getName());
+			System.out.println(" and landed on " + square[pos].name());
 			boolean owned = square[pos].isOwned();
-			boolean ownable = square[pos].square().isOwnable();
+			boolean ownable = square[pos].isOwnable();
 
 			if (!owned && ownable)
 				unowned(player, square[pos]);
 			else if (ownable)
 				owned(player, square[pos], roll.val);
-			else {
-				switch (square[pos].type()) {
-					case TAXES:
-						payTax(player, (Taxes) square[pos].square(), square[pos]);
-						break;
-					case CARDS:
-						drawCard(player, (Cards) square[pos].square(), square[pos]);
-						break;
-					case JAIL:
-						jailInteraction(player, (Jail) square[pos].square());
-						break;
-					case INACTIVE:
-						break;
-					default:
-						break;
-				}
-			}
+			else if (square[pos] instanceof Taxes)
+				payTax(player, (Taxes) square[pos], square[pos]);
+			else if (square[pos] instanceof Cards)
+				drawCard(player, (Cards) square[pos], square[pos]);
+			else if (square[pos] instanceof Jail)
+				jailInteraction(player, (Jail) square[pos]);
 
 			if (!roll.is_double)
 				break;
@@ -246,17 +235,17 @@ public class Monopoly {
 	}
 
 	public void unowned(Player player, Square square) {
-		Square squareIf = square.square();
+		Square squareIf = square;
 		int cost = squareIf.cost();
 
 		if (totalVal(availableAssets(player)) + player.getMoney() < cost) {
-			System.out.println("You cannot afford to purchase " + square.getName());
+			System.out.println("You cannot afford to purchase " + square.name());
 			purchase(auction(player, square), square);
 			return;
 		}
 
 		boolean additional = false;
-		System.out.println("Would you like to purchase " + square.getName() + " for " + cost + " (Yes/No)?");
+		System.out.println("Would you like to purchase " + square.name() + " for " + cost + " (Yes/No)?");
 
 		if (player.getMoney() < cost) {
 			additional = true;
@@ -288,12 +277,12 @@ public class Monopoly {
 	private void purchase(Player player, Square square) {
 		if (player == null || square == null) return;
 
-		player.addProperty(square.getPos());
-		square.square().purchase(player);
+		player.addProperty(square);
+		square.purchase(player);
 	}
 
 	private Player auction(Player player, Square square) {
-		System.out.println("Auctioning off " + square.getName() + ".");
+		System.out.println("Auctioning off " + square.name() + ".");
 		int currentBid = -10;
 		final int BID_INCREMENT = 10;
 
@@ -301,7 +290,7 @@ public class Monopoly {
 		String[] names = new String[players.size() - 1];
 		for (Player p : players) {
 			if (!p.equals(player))
-				names[count++] = p.getName();
+				names[count++] = p.name();
 		}
 
 		Player winner = null;
@@ -314,26 +303,26 @@ public class Monopoly {
 			System.out.println("Select player name");
 			String name = names[input.inputDecision(names)];
 			for (Player p : players) {
-				if (p.getName().equals(name)) {
+				if (p.name().equals(name)) {
 					winner = p;
 					break;
 				}
 			}
 
-			System.out.println(winner.getName() + ", please enter your bid.");
+			System.out.println(winner.name() + ", please enter your bid.");
 			int bid = input.inputInt();
 			if (bid < minBid) {
 				System.out.println("Bid is below minimum bid. Please try again.");
 				continue;
 			}
 
-			System.out.println("Bid accepted. Current highest bid - " + winner.getName() + " for $" + bid);
+			System.out.println("Bid accepted. Current highest bid - " + winner.name() + " for $" + bid);
 			currentBid = bid;
 		}
 
 		if (winner != null) {
 			winner.excMoney(-1 * currentBid);
-			System.out.println(winner.getName() + " wins auction, for $" + currentBid);
+			System.out.println(winner.name() + " wins auction, for $" + currentBid);
 		} else
 			System.out.println("No player wins auction.");
 
@@ -341,13 +330,13 @@ public class Monopoly {
 	}
 
 	private void owned(Player player, Square square, int val) {
-		Square squareIf = square.square();
+		Square squareIf = square;
 		int cost = squareIf.rent(val);
 		Player owner = squareIf.owner();
 		if (player.getPlayer() == owner.getPlayer())
 			return;
 		boolean additional = false;
-		System.out.println("You have landed on " + square.getName() + " and owe " + cost + " in rent.");
+		System.out.println("You have landed on " + square.name() + " and owe " + cost + " in rent.");
 		if (player.getMoney() < cost) {
 			additional = true;
 			System.out.println("This transaction will require additional funds.");
@@ -371,7 +360,7 @@ public class Monopoly {
 
 	private void payTax(Player player, Taxes tax, Square square) {
 		int cost;
-		if (square.getPos() == 4) {
+		if (square.position() == 4) {
 			System.out.println("Would you like to pay 10% or 200 (10%/200)?");
 			int choice = input.inputDecision(new String[]{"10%", "200"});
 			if (choice == 1)
@@ -381,7 +370,7 @@ public class Monopoly {
 		} else
 			cost = tax.tax();
 		boolean additional = false;
-		System.out.println("You have landed on " + square.getName() + " and owe " + cost + " in rent.");
+		System.out.println("You have landed on " + square.name() + " and owe " + cost + " in rent.");
 		if (player.getMoney() < cost) {
 			additional = true;
 			System.out.println("This transaction will require additional funds.");
@@ -461,7 +450,7 @@ public class Monopoly {
 		System.out.println("Go to Jail!");
 		player.moveTo(JAIL_POS);
 		Square[] square = board.getBoard();
-		Jail jail = (Jail) square[JAIL_POS].square();
+		Jail jail = (Jail) square[JAIL_POS];
 		jailInteraction(player, jail);
 	}
 
@@ -490,7 +479,7 @@ public class Monopoly {
 				System.out.println("You own the following properties:");
 				int counter = 1;
 				for (Square sq : props)
-					System.out.println(counter++ + ") " + sq.getName());
+					System.out.println(counter++ + ") " + sq.name());
 
 				int propNum = input.inputInt();
 				int propState = 1;
@@ -509,7 +498,7 @@ public class Monopoly {
 	private Queue<Square> availableAssets(Player player) {
 		Queue<Square> props = new LinkedList<>();
 		for (Square sq : player.properties()) {
-			Square property = sq.square();
+			Square property = sq;
 			if (property.isOwnable() && property.isMortgaged())
 				props.add(property);
 		}
@@ -530,11 +519,9 @@ public class Monopoly {
 	}
 
 	private void lose(Player loser, Player winner) {
-		Queue<Integer> props = loser.propIDs();
 		Queue<Square> squares = loser.properties();
-		while (!props.isEmpty()) {
-			int i = props.remove();
-			winner.addProperty(i);
+		while (!squares.isEmpty()) {
+			winner.addProperty(squares.remove());
 			squares.remove();
 		}
 		winner.excMoney(loser.getMoney());
@@ -550,17 +537,17 @@ public class Monopoly {
 		for (Player player : players) {
 			System.out.println("----------------------------------------");
 			System.out.println("Player " + counter++);
-			System.out.printf("%-10s%30s%n", "Name", player.getName());
+			System.out.printf("%-10s%30s%n", "Name", player.name());
 			System.out.printf("%-10s%30s%n", "Money", player.getMoney());
-			System.out.printf("%-10s%30s%n", "Position", player.getPos());
+			System.out.printf("%-10s%30s%n", "Position", player.position());
 			System.out.printf("%-10s", "Properties");
 			Queue<Square> owned = player.properties();
 			if (owned.isEmpty())
 				System.out.printf("%30s%n", "none");
 			else
-				System.out.printf("%30s%n", owned.remove().getName());
+				System.out.printf("%30s%n", owned.remove().name());
 			for (Square s : owned)
-				System.out.printf("%40s%n", s.getName());
+				System.out.printf("%40s%n", s.name());
 			System.out.println("----------------------------------------");
 		}
 	}

@@ -1,11 +1,8 @@
 package monopoly;
 
-import java.util.LinkedList;
-import java.util.Queue;
-
 public class ValueEstimator
 {
-    private Queue<Player.PlayerType> playerQueue; //contains all player enums
+ /*   private Queue<Player.PlayerType> playerQueue; //contains all player enums
     private Queue<Integer> posQueue;  //contains all player positions
     private Board board;  //stores a board
     private Player player;  //stores current player
@@ -23,7 +20,7 @@ public class ValueEstimator
         //iterate through queue of players, enqueue position and enum
         for (Player p : queue)
         {
-            posQueue.add(p.getPos());
+            posQueue.add(p.position());
             playerQueue.add(p.getPlayer());
         }
         this.board = board;
@@ -39,7 +36,7 @@ public class ValueEstimator
         ProbDice probDice = new ProbDice();
         Player player = new Player(Player.PlayerType.PLAYER_A, "Francis");
         Queue<Player> queue = new LinkedList<>();
-        Cards chance = new Cards(Card.CardType.CHANCE);
+        Cards chance = new Cards("Chance", 0, Card.CardType.CHANCE);
 
         Player player1 = new Player(Player.PlayerType.PLAYER_B, "John");
         Player player2 = new Player(Player.PlayerType.PLAYER_C, "Jim");
@@ -91,24 +88,22 @@ public class ValueEstimator
             int playerID = playerQueue.remove().ordinal(); //enum to int
             for (Square s : props)
             {
-                int i = s.getPos();
-                Square.SquareType type = s.type();
-                probs[i][playerID] = getProb(i, j, type);
+                int i = s.position();
+                probs[i][playerID] = getProb(i, j, s);
             }
         }
         return probs;
     }
     
     //probability of getting from playerPos to squarePos
-    private double getProb(int squarePos, int playerPos,
-                                        Square.SquareType type)
+    private double getProb(int squarePos, int playerPos, Square square)
     {
         if (squarePos < playerPos)
             squarePos += board.getSize(); //accounts for passing go
         int dist = squarePos - playerPos;
 
         double prob = directProb(dist);
-        prob += indirectProb(squarePos, playerPos, type);
+        prob += indirectProb(squarePos, playerPos, square);
         return prob;
     }
 
@@ -119,8 +114,7 @@ public class ValueEstimator
     }
     
     //probability of landing on property by chance card
-    private double indirectProb(int squarePos, int playerPos,
-                                        Square.SquareType type)
+    private double indirectProb(int squarePos, int playerPos, Square square)
     {
         //TODO Account for rolls remaining after chance if doubles
         double prob = 0.0;
@@ -295,5 +289,5 @@ public class ValueEstimator
         }
 
         return numWays;
-    }
+    }*/
 }

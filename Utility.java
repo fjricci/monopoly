@@ -42,11 +42,7 @@ public class Utility implements Square {
         owner = player;
         ownerType = player.getPlayer();
         numOwned = 1;
-        for (Square s : player.properties())
-        {
-            if (s.type() == Square.SquareType.UTILITY)
-                numOwned++;
-        }
+        player.properties().stream().filter(s -> s instanceof Utility).forEach(s -> numOwned++);
     }
 	
 	//update number of utilities owned by a player

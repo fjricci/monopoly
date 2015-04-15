@@ -10,6 +10,8 @@ public interface Square {
 
     boolean isOwnable();
 
+    boolean isOwned();
+
     boolean isMortgaged();
 
     int cost();
@@ -19,6 +21,8 @@ public interface Square {
     int rent(int val);
 
     int mortgageCost();
+
+    int mortgage();
 
     Player owner();
 }

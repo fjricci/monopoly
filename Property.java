@@ -148,8 +148,7 @@ public class Property implements Square {
         {
             mortgaged = false;
             return (int) Math.round((value / 2) * 1.1);
-        }
-        else
+        } else
         {
             mortgaged = true;
             return value / 2;

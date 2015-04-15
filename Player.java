@@ -5,24 +5,17 @@ import java.util.Queue;
 
 public class Player
 {
-    public enum PlayerType
-    {
-        PLAYER_A, PLAYER_B, PLAYER_C, PLAYER_D,
-        PLAYER_E, PLAYER_F, PLAYER_G, PLAYER_H, BANK;
-    }
-
+	private final int BOARD_SIZE = 40;
+	private final int TO_JAIL = 30;
+	private final int IN_JAIL = 10;
 	private int money;
 	private Queue<Square> properties;
 	private int position;
 	private PlayerType player;
 	private String playerName;
-	private final int BOARD_SIZE = 40;
 	private boolean inJail;
 	private int jailTurn;
 	private int numJailFree;
-	private final int TO_JAIL = 30;
-	private final int IN_JAIL = 10;
-	
 	public Player(PlayerType player, String playerName)
 	{
 		money = 1500;
@@ -33,30 +26,13 @@ public class Player
 		inJail = false;
 		numJailFree = 0;
 	}
-	
-	public void addProperty(int position)
+
+	public void addProperty(Square square)
 	{
-		Square square = new Square(position);
-		if (!square.ownable())
-		    throw new IllegalArgumentException("This property cannot "
-		                                                   + "be purchased!");
+		if (!square.isOwnable())
+			throw new IllegalArgumentException("This property cannot be purchased!");
 		properties.add(square);
-		Square.SquareType sqType = square.type();
-		
-		switch (sqType)
-        {
-        case JAIL:      break;
-        case TAXES:     break;
-        case CARDS:     break;
-        case INACTIVE:  break;
-        case PROPERTY:  ((Property) square.square()).purchase(this);
-        break;
-        case RAILROAD:  ((Railroad) square.square()).purchase(this);
-        break;
-        case UTILITY:   ((Utility) square.square()).purchase(this);
-        break;
-        default:        break;
-        }
+		square.purchase(this);
 	}
 	
 	public void move(int numSpaces)
@@ -67,7 +43,7 @@ public class Player
 	        position -= BOARD_SIZE;
 	        excMoney(200);
 	    }
-	    
+
 	    if (position == TO_JAIL)
 	    {
 	        position = IN_JAIL;
@@ -78,15 +54,15 @@ public class Player
 	public void moveTo(int pos)
 	{
 	    position = pos;
-        
+
         if (position == TO_JAIL)
         {
             position = IN_JAIL;
             toJail();
         }
 	}
-	
-	public int getPos()
+
+	public int position()
 	{
 	    return position;
 	}
@@ -103,8 +79,8 @@ public class Player
 	        tempProp.add(s);
 	    return tempProp;
 	}
-	
-	public String getName()
+
+	public String name()
 	{
 	    return playerName;
 	}
@@ -118,15 +94,15 @@ public class Player
     {
 	    Queue<Integer> queue = new LinkedList<Integer>();
 	    for (Square s : properties)
-	        queue.add(s.getPos());
-        return queue;
+		    queue.add(s.position());
+	    return queue;
     }
-    
+
 	public int getMoney()
 	{
 	    return money;
 	}
-	
+
 	public void excMoney(int money)
 	{
 	    this.money += money;
@@ -177,48 +153,28 @@ public class Player
 	    return numJailFree;
 	}
 
-    public int getAssets()
+	public int getAssets()
     {
-        int cash = this.money;
-        int props = 0;
-        int houses = 0;
-        for (Square s : properties)
+	    int assets = this.money;
+	    for (Square s : properties)
         {
-            switch(s.type())
-            {
-            case PROPERTY: props += getPropVal((Property) s.square());
-                           houses += getHouseVal((Property) s.square());
-                           break;
-            case RAILROAD: props += getRailVal((Railroad) s.square());
-                           break;
-            case UTILITY:  props += getUtilVal((Utility) s.square());
-                           break;
-            default:       break;
-            }
+	        assets += s.cost();
+	        if (s instanceof Property)
+		        assets += getHouseVal((Property) s);
         }
-        return cash + props + houses;
+	    return assets;
     }
-    
-    private int getPropVal(Property prop)
-    {
-        return prop.cost();
-    }
-    
-    private int getRailVal(Railroad rail)
-    {
-        return rail.cost();
-    }
-    
-    private int getUtilVal(Utility util)
-    {
-        return util.cost();
-    }
-    
-    private int getHouseVal(Property prop)
+
+	private int getHouseVal(Property prop)
     {
         int numHouses = prop.numHouses();
         int houseCost = prop.houseCost();
-        
-        return numHouses * houseCost;
+
+	    return numHouses * houseCost;
+    }
+
+	public enum PlayerType {
+		PLAYER_A, PLAYER_B, PLAYER_C, PLAYER_D,
+		PLAYER_E, PLAYER_F, PLAYER_G, PLAYER_H, BANK
     }
 }

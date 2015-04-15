@@ -17,6 +17,10 @@ public class Board
 			board[i] = makeSquare(i);
 		}
 	}
+
+	public Square square(int pos) {
+		return board[pos];
+	}
 	
 	//return an array of the squares on the board
 	public Square[] getBoard() {

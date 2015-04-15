@@ -23,6 +23,14 @@ public class Taxes implements Square {
 		this.pos = pos;
 	}
 
+	public boolean isOwned() {
+		return false;
+	}
+
+	public int mortgage() {
+		return 0;
+	}
+
 	public int position() {
 		return pos;
 	}
