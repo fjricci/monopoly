@@ -235,8 +235,7 @@ public class Monopoly {
 	}
 
 	public void unowned(Player player, Square square) {
-		Square squareIf = square;
-		int cost = squareIf.cost();
+		int cost = square.cost();
 
 		if (totalVal(availableAssets(player)) + player.getMoney() < cost) {
 			System.out.println("You cannot afford to purchase " + square.name());
@@ -300,7 +299,7 @@ public class Monopoly {
 			if (!input.inputBool())
 				break;
 
-			System.out.println("Select player name");
+			System.out.println("Please enter player name");
 			String name = names[input.inputDecision(names)];
 			for (Player p : players) {
 				if (p.name().equals(name)) {
@@ -362,8 +361,7 @@ public class Monopoly {
 		int cost;
 		if (square.position() == 4) {
 			System.out.println("Would you like to pay 10% or 200 (10%/200)?");
-			int choice = input.inputDecision(new String[]{"10%", "200"});
-			if (choice == 1)
+			if (input.inputDecision(new String[]{"10%", "200"}) == 0)
 				cost = tax.tax(player.getAssets());
 			else
 				cost = tax.tax();
