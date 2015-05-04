@@ -1,21 +1,27 @@
 package monopoly;
 
-import java.util.LinkedList;
-import java.util.Queue;
-
 public class Board
 {
-	private final int N = 40; //number of squares on the board (40 for monopoly)
 	private Square[] board; //representation of board
 	
 	//constructor for a new board of squares
 	public Board() {
+		int N = 40;
 		board = new Square[N];
 		//initialize board squares
 		for (int i = 0; i < N; i++)
-		{
 			board[i] = makeSquare(i);
+
+		makeGroups();
+	}
+
+	private Property property(String name) {
+		for (Square sq : board) {
+			if (sq instanceof Property && sq.name().equals(name))
+				return (Property) sq;
 		}
+
+		return null;
 	}
 
 	public Square square(int pos) {
@@ -25,19 +31,6 @@ public class Board
 	//return an array of the squares on the board
 	public Square[] getBoard() {
 	    return board;
-	}
-	
-	//return a queue of the squares on the board
-	public Queue<Square> squares() {
-	    Queue<Square> queue = new LinkedList<Square>();
-	    for (int i = 0; i < N; i++)
-	        queue.add(board[i]);
-	    return queue;
-	}
-	
-	//return the number of squares on the board
-	public int getSize() {
-	    return N;
 	}
 
 	private Square makeSquare(int pos) {
@@ -127,69 +120,84 @@ public class Board
 		}
 	}
 
+	private void makeGroups() {
+		makeGroup("Mediterranean Avenue", "Baltic Avenue");
+		makeGroup("Oriental Avenue", "Vermont Avenue", "Connecticut Avenue");
+		makeGroup("St. Charles Place", "States Avenue", "Virginia Avenue");
+		makeGroup("St. James Place", "Tennessee Avenue", "New York Avenue");
+		makeGroup("Kentucky Avenue", "Indiana Avenue", "Illinois Avenue");
+		makeGroup("Atlantic Avenue", "Ventor Avenue", "Marvin Gardens");
+		makeGroup("Pennsylvania Avenue", "North Carolina Avenue", "Pacific Avenue");
+		makeGroup("Park Place", "Boardwalk");
+	}
+
+	private void makeGroup(String nameA, String nameB) {
+		makeGroup(nameA, nameB, null);
+	}
+
+	private void makeGroup(String nameA, String nameB, String nameC) {
+		Property propA = property(nameA);
+		Property propB = property(nameB);
+		Property propC = null;
+		if (nameC != null)
+			propC = property(nameC);
+
+		propA.setGroup(propB, propC);
+		propB.setGroup(propA, propC);
+		if (propC != null)
+			propC.setGroup(propA, propB);
+	}
+
 	private Square luxury(String name, int pos) {
-		Square square = new Taxes(name, pos, 75);
-		return square;
+		return new Taxes(name, pos, 75);
 	}
 
 	private Square shortLine(String name, int pos) {
-		Square square = new Railroad(name, pos);
-		return square;
+		return new Railroad(name, pos);
 	}
 
 	private Square toJail(String name, int pos) {
-		Square square = new Jail(name, pos, Jail.JailType.TO_JAIL);
-		return square;
+		return new Jail(name, pos, Jail.JailType.TO_JAIL);
 	}
 
 	private Square water(String name, int pos) {
-		Square square = new Utility(name, pos);
-		return square;
+		return new Utility(name, pos);
 	}
 
 	private Square bAndO(String name, int pos) {
-		Square square = new Railroad(name, pos);
-		return square;
+		return new Railroad(name, pos);
 	}
 
 	private Square pennsylvaniaRR(String name, int pos) {
-		Square square = new Railroad(name, pos);
-		return square;
+		return new Railroad(name, pos);
 	}
 
 	private Square electric(String name, int pos) {
-		Square square = new Utility(name, pos);
-		return square;
+		return new Utility(name, pos);
 	}
 
 	private Square jail(String name, int pos) {
-		Square square = new Jail(name, pos, Jail.JailType.VISITING);
-		return square;
+		return new Jail(name, pos, Jail.JailType.VISITING);
 	}
 
 	private Square chance(String name, int pos) {
-		Square square = new Cards(name, pos, Card.CardType.CHANCE);
-		return square;
+		return new Cards(name, pos, Card.CardType.CHANCE);
 	}
 
 	private Square reading(String name, int pos) {
-		Square square = new Railroad(name, pos);
-		return square;
+		return new Railroad(name, pos);
 	}
 
 	private Square income(String name, int pos) {
-		Square square = new Taxes(name, pos, 200, 10);
-		return square;
+		return new Taxes(name, pos, 200, 10);
 	}
 
 	private Square community(String name, int pos) {
-		Square square = new Cards(name, pos, Card.CardType.COMMUNITY);
-		return square;
+		return new Cards(name, pos, Card.CardType.COMMUNITY);
 	}
 
 	private Square go(String name, int pos) {
-		Square square = new Inactive(name, pos);
-		return square;
+		return new Inactive(name, pos);
 	}
 
 	private Square mediterranean(String name, int pos) {
@@ -201,9 +209,7 @@ public class Board
 		int hotel = 250;
 		int cost = 60;
 		int houses = 50;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square baltic(String name, int pos) {
@@ -215,9 +221,7 @@ public class Board
 		int hotel = 450;
 		int cost = 60;
 		int houses = 50;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square oriental(String name, int pos) {
@@ -229,9 +233,7 @@ public class Board
 		int hotel = 550;
 		int cost = 100;
 		int houses = 50;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square vermont(String name, int pos) {
@@ -243,9 +245,7 @@ public class Board
 		int hotel = 550;
 		int cost = 100;
 		int houses = 50;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square connecticut(String name, int pos) {
@@ -257,9 +257,7 @@ public class Board
 		int hotel = 600;
 		int cost = 120;
 		int houses = 50;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square charles(String name, int pos) {
@@ -271,9 +269,7 @@ public class Board
 		int hotel = 750;
 		int cost = 140;
 		int houses = 100;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square states(String name, int pos) {
@@ -285,9 +281,7 @@ public class Board
 		int hotel = 750;
 		int cost = 140;
 		int houses = 100;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square virginia(String name, int pos) {
@@ -299,9 +293,7 @@ public class Board
 		int hotel = 900;
 		int cost = 160;
 		int houses = 100;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square james(String name, int pos) {
@@ -313,9 +305,7 @@ public class Board
 		int hotel = 950;
 		int cost = 180;
 		int houses = 100;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square tennessee(String name, int pos) {
@@ -327,9 +317,7 @@ public class Board
 		int hotel = 950;
 		int cost = 180;
 		int houses = 100;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square newYork(String name, int pos) {
@@ -341,9 +329,7 @@ public class Board
 		int hotel = 1000;
 		int cost = 200;
 		int houses = 100;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square kentucky(String name, int pos) {
@@ -355,9 +341,7 @@ public class Board
 		int hotel = 1050;
 		int cost = 220;
 		int houses = 150;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square indiana(String name, int pos) {
@@ -369,9 +353,7 @@ public class Board
 		int hotel = 1050;
 		int cost = 220;
 		int houses = 150;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square illinois(String name, int pos) {
@@ -383,9 +365,7 @@ public class Board
 		int hotel = 1100;
 		int cost = 240;
 		int houses = 150;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square atlantic(String name, int pos) {
@@ -397,9 +377,7 @@ public class Board
 		int hotel = 1150;
 		int cost = 260;
 		int houses = 150;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square ventor(String name, int pos) {
@@ -411,9 +389,7 @@ public class Board
 		int hotel = 1150;
 		int cost = 260;
 		int houses = 150;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square marvin(String name, int pos) {
@@ -425,9 +401,7 @@ public class Board
 		int hotel = 1200;
 		int cost = 280;
 		int houses = 150;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square pacific(String name, int pos) {
@@ -439,9 +413,7 @@ public class Board
 		int hotel = 1275;
 		int cost = 300;
 		int houses = 200;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square carolina(String name, int pos) {
@@ -453,9 +425,7 @@ public class Board
 		int hotel = 1275;
 		int cost = 300;
 		int houses = 200;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square pennsylvaniaAve(String name, int pos) {
@@ -467,9 +437,7 @@ public class Board
 		int hotel = 1400;
 		int cost = 320;
 		int houses = 200;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square park(String name, int pos) {
@@ -481,9 +449,7 @@ public class Board
 		int hotel = 1500;
 		int cost = 350;
 		int houses = 200;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square boardwalk(String name, int pos) {
@@ -495,14 +461,11 @@ public class Board
 		int hotel = 2000;
 		int cost = 400;
 		int houses = 200;
-		Square square = new Property(name, pos, rent, oneH, twoH,
-		                             threeH, fourH, hotel, cost, houses);
-		return square;
+		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
 	private Square parking(String name, int pos) {
-		Square square = new Inactive(name, pos);
-		return square;
+		return new Inactive(name, pos);
 	}
 
 }

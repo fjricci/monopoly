@@ -2,31 +2,35 @@ package monopoly;
 
 import monopoly.Player.PlayerType;
 
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.stream.Collectors;
+
 public class Property implements Square {
 	//costs of rent for all possible property states
-	private int rent;
-	private int oneH;
-	private int twoH;
-	private int threeH;
-	private int fourH;
-	private int hotel;
-	
-	private int value; //cost to purchase property
-	private int houses; //cost to purchase one house on property
-	
+	private final int rent;
+	private final int oneH;
+	private final int twoH;
+	private final int threeH;
+	private final int fourH;
+	private final int hotel;
+
+	private final int value; //cost to purchase property
+	private final int houses; //cost to purchase one house on property
+	private final int pos;
+	private final String name;
 	private int buildings;  //building status
 	private boolean monopoly; //does one player own all properties in set?
 	private boolean owned;  //is property owned?
 	private boolean mortgaged; //is property mortgaged
 	private PlayerType ownerType;
 	private Player owner;
+	private Property groupA;
+	private Property groupB;
 
-	private int pos;
-	private String name;
-	
 	//construct property, given its rents
-	public Property(String name, int pos, int rent, int oneH, int twoH,
-	                int threeH, int fourH, int hotel, int value, int houses)
+	public Property(String name, int pos, int rent, int oneH, int twoH, int threeH, int fourH,
+	                int hotel, int value, int houses)
 	{
 		this.rent = rent;
 		this.oneH = oneH;
@@ -42,6 +46,11 @@ public class Property implements Square {
 
 		this.pos = pos;
 		this.name = name;
+	}
+
+	public void setGroup(Property groupA, Property groupB) {
+		this.groupA = groupA;
+		this.groupB = groupB;
 	}
 
 	public int position() {
@@ -62,6 +71,38 @@ public class Property implements Square {
 		owned = true;
 		owner = player;
 		ownerType = player.getPlayer();
+
+		updateMonopoly(player);
+	}
+
+	private void updateMonopoly(Player player) {
+		boolean a = false;
+		boolean b = false;
+
+		if (groupB == null)
+			b = true;
+
+		Queue<Property> props = player.properties().stream().filter(square -> square instanceof Property).map(
+				square -> (Property) square).collect(Collectors.toCollection(LinkedList::new));
+
+		for (Property prop : props) {
+			if (prop.name().equals(groupA.name()))
+				a = true;
+			if (groupB != null && prop.name().equals(groupB.name()))
+				b = true;
+		}
+
+		if (a && b) {
+			setMonopoly();
+			groupA.setMonopoly();
+			if (groupB != null)
+				groupB.setMonopoly();
+		} else {
+			breakMonopoly();
+			groupA.breakMonopoly();
+			if (groupB != null)
+				groupB.breakMonopoly();
+		}
 	}
 	
 	public boolean isOwned()
@@ -76,14 +117,13 @@ public class Property implements Square {
 		if (buildings > 5)
 			throw new IllegalArgumentException("Cannot build past hotel!");
 		if (buildings < 0)
-			throw new IllegalArgumentException("Cannot build negative "
-			                                                 + "buildings!");
+			throw new IllegalArgumentException("Cannot build negative buildings!");
 	}
 	
 	//switch status of monopoly
-	public void monopoly()
+	public boolean monopoly()
 	{
-		monopoly = !monopoly;
+		return monopoly;
 	}
 	
 	//cost to purchase property
@@ -91,19 +131,7 @@ public class Property implements Square {
 	{
 		return value;
 	}
-	
-	//return cost to purchase a given number of houses
-	public int buyHouses(int n)
-	{
-		return n*houses;
-	}
-	
-	//return cost from selling a given number of houses
-	public int sellHouses(int n)
-	{
-		return n*houses/2;
-	}
-	
+
 	//return number of buildings owned
 	public int numHouses()
 	{
@@ -162,4 +190,12 @@ public class Property implements Square {
 	public int mortgageCost() {
 		return value / 2;
     }
+
+	public void setMonopoly() {
+		monopoly = true;
+	}
+
+	public void breakMonopoly() {
+		monopoly = false;
+	}
 }

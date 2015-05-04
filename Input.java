@@ -1,5 +1,6 @@
 package monopoly;
 
+import java.util.Queue;
 import java.util.Scanner;
 
 /**
@@ -43,6 +44,26 @@ public class Input {
             System.out.println("Please enter a valid decision.");
         }
     }
+
+	public Player inputPlayer(Queue<Player> players, Player notAllowed) {
+		Player player = null;
+		do {
+			String name = inputString();
+			for (Player p : players) {
+				if (name.equals(p.name()))
+					player = p;
+			}
+			if (player == null)
+				System.out.println("Invalid player, please enter another name.");
+
+			else if (notAllowed != null && player.name().equals(notAllowed.name())) {
+				System.out.println("You may not select this player. Choose another.");
+				player = null;
+			}
+		} while (player == null);
+
+		return player;
+	}
 
     public Dice.Roll inputRoll() {
         Dice.Roll roll = new Dice.Roll();
