@@ -391,7 +391,7 @@ public class Card
 		return travelTo;
 	}
 
-	public boolean travelNear()
+	public boolean travelRail()
 	{
 		return nearestRail;
 	}

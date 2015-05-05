@@ -188,19 +188,8 @@ public class Monopoly {
 			int pos = player.position();
 			Square[] square = board.getBoard();
 			System.out.println(" and landed on " + square[pos].name());
-			boolean owned = square[pos].isOwned();
-			boolean ownable = square[pos].isOwnable();
 
-			if (!owned && ownable)
-				unowned(player, square[pos]);
-			else if (ownable)
-				owned(player, square[pos], roll.val);
-			else if (square[pos] instanceof Taxes)
-				payTax(player, (Taxes) square[pos], square[pos]);
-			else if (square[pos] instanceof Cards)
-				drawCard(player, (Cards) square[pos], square[pos]);
-			else if (square[pos] instanceof Jail)
-				jailInteraction(player, (Jail) square[pos]);
+			handleSquare(player, square[pos], roll.val);
 
 			if (!roll.is_double)
 				break;
@@ -235,6 +224,22 @@ public class Monopoly {
 		}
 
 		System.out.println();
+	}
+
+	private void handleSquare(Player player, Square sq, int roll) {
+		boolean owned = sq.isOwned();
+		boolean ownable = sq.isOwnable();
+
+		if (!owned && ownable)
+			unowned(player, sq);
+		else if (ownable)
+			owned(player, sq, roll);
+		else if (sq instanceof Taxes)
+			payTax(player, (Taxes) sq, sq);
+		else if (sq instanceof Cards)
+			drawCard(player, (Cards) sq);
+		else if (sq instanceof Jail)
+			jailInteraction(player, (Jail) sq);
 	}
 
 	private void buyHouses(Player player) {
@@ -543,7 +548,7 @@ public class Monopoly {
 		}
 	}
 
-	private void drawCard(Player player, Cards cards, Square square) {
+	private void drawCard(Player player, Cards cards) {
 		int numString = 3;
 		Card card = cards.draw();
 		String[] string = new String[numString];
@@ -573,15 +578,98 @@ public class Monopoly {
 			case MOVE_TO:
 				player.moveTo(card.travelTo());
 				break;
-			case MOVE_NEAREST:   //TODO Move Nearest
+			case MOVE_NEAREST:
+				if (card.travelRail())
+					railMove(player);
+				else
+					utilMove(player);
 				break;
-			case STREET_REPAIRS: //TODO Street Repairs
+			case STREET_REPAIRS:
+				streetRepairs(player, card.house(), card.hotel());
 				break;
 			case OUT_JAIL:
 				player.addJailFree();
 				break;
 			default:
 				break;
+		}
+
+		Square sq = board.square(player.position());
+		handleSquare(player, sq, dice.roll().val);
+	}
+
+	private void railMove(Player player) {
+		int pos = player.position();
+
+		for (int i = pos; i < board.size(); i++) {
+			if (board.square(i) instanceof Railroad) {
+				player.moveTo(i);
+				return;
+			}
+		}
+
+		for (int i = 0; i < pos; i++) {
+			if (board.square(i) instanceof Railroad) {
+				player.moveTo(i);
+				return;
+			}
+		}
+
+		throw new RuntimeException("Problem finding railroad");
+	}
+
+	private void utilMove(Player player) {
+		int pos = player.position();
+
+		for (int i = pos; i < board.size(); i++) {
+			if (board.square(i) instanceof Utility) {
+				player.moveTo(i);
+				return;
+			}
+		}
+
+		for (int i = 0; i < pos; i++) {
+			if (board.square(i) instanceof Utility) {
+				player.moveTo(i);
+				return;
+			}
+		}
+
+		throw new RuntimeException("Problem finding utility");
+	}
+
+	private void streetRepairs(Player player, int house, int hotel) {
+		int val = 0;
+
+		for (Square sq : player.properties()) {
+			if (sq instanceof Property) {
+				Property prop = (Property) sq;
+				if (prop.numHouses() < 5)
+					val += house * prop.numHouses();
+				else
+					val += hotel;
+			}
+		}
+
+		boolean additional = false;
+		System.out.println("You owe " + val + " for street repairs.");
+		if (player.getMoney() < val) {
+			additional = true;
+			System.out.println("This transaction will require additional funds.");
+		}
+
+		if (!additional)
+			player.excMoney(-1 * val);
+		else {
+			while (true) {
+				val = additionalFunds(val, player, new Player(PlayerType.BANK, "Bank"));
+				if (val == Integer.MIN_VALUE)
+					return;
+				if (val < 0) {
+					player.excMoney(val * -1);
+					break;
+				}
+			}
 		}
 	}
 

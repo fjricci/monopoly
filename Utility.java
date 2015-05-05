@@ -6,6 +6,8 @@ public class Utility implements Square {
 	private final int TWO = 10;
 	private final int COST = 150; //cost to purchase utility
 
+    private Dice dice;
+
     private Player.PlayerType ownerType; //stores utility owner name enum
     private Player owner;     //stores utility owner
     private boolean owned;  //is utility owned?
@@ -22,6 +24,7 @@ public class Utility implements Square {
 		mortgaged = false;
         this.name = name;
         this.pos = pos;
+        this.dice = new InputDice(new Input());
     }
 
     public int position() {
@@ -59,10 +62,10 @@ public class Utility implements Square {
 	
 	//return rent on utility, given a roll
     public int rent(int roll) {
-        if (roll < 2 || roll > 12)
-			throw new IllegalArgumentException("Invalid Roll!");
-		
-		switch(numOwned)
+        if (roll == 0)
+            roll = dice.roll().val;
+
+        switch(numOwned)
 		{
 			case 1:	return ONE*roll;
 			case 2: return TWO*roll;

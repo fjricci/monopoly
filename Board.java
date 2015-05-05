@@ -2,17 +2,21 @@ package monopoly;
 
 public class Board
 {
+	private final int N = 40;
 	private Square[] board; //representation of board
 	
 	//constructor for a new board of squares
 	public Board() {
-		int N = 40;
 		board = new Square[N];
 		//initialize board squares
 		for (int i = 0; i < N; i++)
 			board[i] = makeSquare(i);
 
 		makeGroups();
+	}
+
+	public int size() {
+		return N;
 	}
 
 	private Property property(String name) {
