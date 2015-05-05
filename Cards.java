@@ -1,17 +1,16 @@
 package monopoly;
 
-import java.util.Queue;
-
 public class Cards implements Square {
 	private final int DECK_SIZE = 16; //16 cards in either type of deck
+	private final boolean deterministic;
 	private Deck deck; //store deck of cards
-
 	private String name;
 	private int pos;
 
 	//construct square of type cards
-	public Cards(String name, int pos, Card.CardType type)
+	public Cards(String name, int pos, Card.CardType type, boolean deterministic)
 	{
+		this.deterministic = deterministic;
 		if (type != Card.CardType.COMMUNITY && type != Card.CardType.CHANCE)
 			throw new IllegalArgumentException("Card type invalid!");
 		if (type == Card.CardType.CHANCE)
@@ -59,7 +58,10 @@ public class Cards implements Square {
 		{
 			cards[i] = new Card(Card.CardType.COMMUNITY, i);
 		}
-		deck = new Deck(cards);
+		if (deterministic)
+			deck = new InputDeck(cards);
+		else
+			deck = new RandomDeck(cards);
 	}
 
 	//create deck of chance cards
@@ -71,7 +73,10 @@ public class Cards implements Square {
 		{
 			cards[i] = new Card(Card.CardType.CHANCE, i);
 		}
-		deck = new Deck(cards);
+		if (deterministic)
+			deck = new InputDeck(cards);
+		else
+			deck = new RandomDeck(cards);
 	}
 
 	//draw next card
@@ -79,13 +84,7 @@ public class Cards implements Square {
 	{
 		return deck.drawCard();
 	}
-	
-	//return iterable queue of cards
-	public Queue<Card> cards()
-	{
-	    return deck.cards();
-	}
-	
+
 	public int size()
 	{
 	    return DECK_SIZE;

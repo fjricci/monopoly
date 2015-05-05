@@ -3,10 +3,12 @@ package monopoly;
 public class Board
 {
 	private final int N = 40;
+	private final boolean deterministic;
 	private Square[] board; //representation of board
 	
 	//constructor for a new board of squares
-	public Board() {
+	public Board(boolean deterministic) {
+		this.deterministic = deterministic;
 		board = new Square[N];
 		//initialize board squares
 		for (int i = 0; i < N; i++)
@@ -146,6 +148,9 @@ public class Board
 		if (nameC != null)
 			propC = property(nameC);
 
+		if (propA == null || propB == null)
+			throw new RuntimeException("Bad property");
+
 		propA.setGroup(propB, propC);
 		propB.setGroup(propA, propC);
 		if (propC != null)
@@ -185,7 +190,7 @@ public class Board
 	}
 
 	private Square chance(String name, int pos) {
-		return new Cards(name, pos, Card.CardType.CHANCE);
+		return new Cards(name, pos, Card.CardType.CHANCE, deterministic);
 	}
 
 	private Square reading(String name, int pos) {
@@ -197,7 +202,7 @@ public class Board
 	}
 
 	private Square community(String name, int pos) {
-		return new Cards(name, pos, Card.CardType.COMMUNITY);
+		return new Cards(name, pos, Card.CardType.COMMUNITY, deterministic);
 	}
 
 	private Square go(String name, int pos) {

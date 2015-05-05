@@ -8,7 +8,7 @@
  * Board.java
  * Card.java
  * Cards.java
- * Deck.java
+ * RandomDeck.java
  * ProbDice.java
  * Inactive.java
  * Jail.java
@@ -47,7 +47,6 @@ public class Monopoly {
 	private Queue<Player> players;
 
 	public Monopoly() {
-		board = new Board(); //create new board
 		players = new LinkedList<>();
 		input = new Input();
 
@@ -58,6 +57,7 @@ public class Monopoly {
 		else
 			dice = new ProbDice(); //two dice, six sided
 
+		board = new Board(deterministic); //create new board
 		initialize();
 	}
 
@@ -595,7 +595,7 @@ public class Monopoly {
 		}
 
 		Square sq = board.square(player.position());
-		handleSquare(player, sq, dice.roll().val);
+		handleSquare(player, sq, 0);
 	}
 
 	private void railMove(Player player) {
