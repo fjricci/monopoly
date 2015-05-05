@@ -2,15 +2,16 @@ package monopoly;
 
 public class Jail implements Square {
 
-    private JailType type;
-
+	private final int pos;
+	private JailType type;
 	private String name;
-	private int pos;
 
 	public Jail(String name, int pos, JailType type) {
 		if (type != JailType.VISITING && type != JailType.TO_JAIL)
 			throw new IllegalArgumentException("Jail type invalid!");
 		this.type = type;
+		this.name = name;
+		this.pos = pos;
 	}
 
 	public String name() {

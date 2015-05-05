@@ -244,7 +244,7 @@ public class Monopoly {
 
 	private void buyHouses(Player player) {
 		do {
-			System.out.println("On which property would you like to purchase houses?");
+			System.out.println("On which property would you like to purchase a house?");
 			Property prop = propertySelect(player, false);
 			if (prop.numHouses() == 5 || !prop.monopoly()) {
 				System.out.println("You cannot buy houses on " + prop.name());
@@ -252,22 +252,22 @@ public class Monopoly {
 				continue;
 			}
 
-			System.out.println("Houses on " + prop.name() + " cost $" + prop.houseCost());
-			int max = Math.min(player.getMoney() / prop.houseCost(), 5 - prop.numHouses());
-			System.out.println("You can afford to buy " + max + " houses.");
-			System.out.println("How many would you like to buy?");
-			int buy;
-			while (true) {
-				buy = input.inputInt();
-				if (buy > max || buy < 1)
-					System.out.println("Please enter a valid number of houses.");
-				else
-					break;
+			if (player.getMoney() < prop.houseCost()) {
+				System.out.println("You cannot afford to buy houses on " + prop.name());
+				System.out.println("Would you like to buy any more houses?");
+				continue;
 			}
 
-			prop.build(buy);
-			player.excMoney(-1 * prop.houseCost() * buy);
+			if (!prop.groupBuild()) {
+				System.out.println("You must build evenly. Select another property.");
+				System.out.println("Would you like to buy any more houses?");
+				continue;
+			}
 
+			prop.build(1);
+			player.excMoney(-1 * prop.houseCost());
+
+			System.out.println("You now own " + prop.numHouses() + " houses on " + prop.name());
 			System.out.println("Would you like to buy any more houses?");
 		} while (input.inputBool());
 	}
@@ -275,30 +275,24 @@ public class Monopoly {
 	private int sellHouses(Player player) {
 		int value = 0;
 		do {
-			System.out.println("On which property would you like to sell houses?");
+			System.out.println("On which property would you like to sell a house?");
 			Property prop = propertySelect(player, false);
 			if (prop.numHouses() == 0) {
 				System.out.println("You cannot sell houses on " + prop.name());
 				System.out.println("Would you like to sell any more houses?");
 				continue;
 			}
-			int sellPrice = prop.houseCost() / 2;
 
-			System.out.println("You gain $" + sellPrice + "from selling houses on " + prop.name());
-			System.out.println("You can sell up to " + prop.numHouses() + " houses.");
-			System.out.println("How many would you like to sell?");
-			int sell;
-			while (true) {
-				sell = input.inputInt();
-				if (sell > prop.numHouses() || sell < 1)
-					System.out.println("Please enter a valid number of houses.");
-				else
-					break;
+			if (!prop.groupSell()) {
+				System.out.println("You must build evenly. Select another property.");
+				System.out.println("Would you like to sell any more houses?");
+				continue;
 			}
 
-			prop.build(-1 * sell);
-			value += sellPrice * sell;
+			prop.build(-1);
+			value += prop.houseCost() / 2;
 
+			System.out.println("You now own " + prop.numHouses() + " houses on " + prop.name());
 			System.out.println("Would you like to sell any more houses?");
 		} while (input.inputBool());
 		player.excMoney(value);
@@ -564,6 +558,8 @@ public class Monopoly {
 			System.out.println(string[i]);
 		}
 
+		int initialPos = player.position();
+
 		switch (card.action()) {
 			case BANK_MONEY:
 				player.excMoney(card.value());
@@ -593,6 +589,9 @@ public class Monopoly {
 			default:
 				break;
 		}
+
+		if (initialPos == player.position())
+			return;
 
 		Square sq = board.square(player.position());
 		handleSquare(player, sq, 0);

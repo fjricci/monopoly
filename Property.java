@@ -198,4 +198,28 @@ public class Property implements Square {
 	public void breakMonopoly() {
 		monopoly = false;
 	}
+
+	public boolean groupBuild() {
+		int aDiff = groupA.numHouses() - numHouses();
+		boolean aOkay = aDiff == 0 || aDiff == 1;
+		if (groupB == null)
+			return aOkay;
+
+		int bDiff = groupB.numHouses() - numHouses();
+		boolean bOkay = bDiff == 0 || bDiff == 1;
+
+		return aOkay && bOkay;
+	}
+
+	public boolean groupSell() {
+		int aDiff = groupA.numHouses() - numHouses();
+		boolean aOkay = aDiff == 0 || aDiff == -1;
+		if (groupB == null)
+			return aOkay;
+
+		int bDiff = groupB.numHouses() - numHouses();
+		boolean bOkay = bDiff == 0 || bDiff == -1;
+
+		return aOkay && bOkay;
+	}
 }
