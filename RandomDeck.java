@@ -16,7 +16,7 @@ public class RandomDeck implements Deck {
 		outOfJailFree = true;
 	}
 
-	public void initialize(Card[] cards){
+	public void initialize(Card[] cards) {
 		SIZE = cards.length;
 		deck.addAll(Arrays.asList(cards));
 		Collections.shuffle(deck);

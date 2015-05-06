@@ -58,8 +58,7 @@ public class Monopoly {
 			dice = new InputDice(input);
 			chance = new InputDeck();
 			community = new InputDeck();
-		}
-		else {
+		} else {
 			dice = new ProbDice(); //two dice, six sided
 			chance = new RandomDeck();
 			community = new RandomDeck();
@@ -171,21 +170,19 @@ public class Monopoly {
 		while (true) {
 			if (player.inJail()) {
 				System.out.println("Would you like to get out of jail using cash or card?");
-				if (input.inputBool()){
+				if (input.inputBool()) {
 					System.out.println("Select cash or card.");
 					int choice = input.inputDecision(new String[]{"cash", "card"});
 					if (choice == 0) {
 						player.excMoney(-50);
 						player.leaveJail();
-					}
-					else if (player.numJailFree() > 0) {
+					} else if (player.numJailFree() > 0) {
 						if (player.useJailFree())
 							chance.returnOutOfJail();
 						else
 							community.returnOutOfJail();
 						player.leaveJail();
-					}
-					else
+					} else
 						System.out.println("You don't have any cards.");
 				}
 			}

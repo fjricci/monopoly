@@ -2,9 +2,7 @@ package monopoly;
 
 import monopoly.Player.PlayerType;
 
-import java.util.Formatter;
 import java.util.LinkedList;
-import java.util.Locale;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
@@ -32,8 +30,7 @@ public class Property implements Square {
 
 	//construct property, given its rents
 	public Property(String name, int pos, int rent, int oneH, int twoH, int threeH, int fourH,
-	                int hotel, int value, int houses)
-	{
+	                int hotel, int value, int houses) {
 		this.rent = rent;
 		this.oneH = oneH;
 		this.twoH = twoH;
@@ -66,10 +63,9 @@ public class Property implements Square {
 	public boolean isOwnable() {
 		return true;
 	}
-	
+
 	//update status of property to owned
-	public void purchase(Player player)
-	{
+	public void purchase(Player player) {
 		owned = true;
 		owner = player;
 		ownerType = player.getPlayer();
@@ -106,92 +102,89 @@ public class Property implements Square {
 				groupB.breakMonopoly();
 		}
 	}
-	
-	public boolean isOwned()
-	{
-	    return owned;
+
+	public boolean isOwned() {
+		return owned;
 	}
-	
+
 	//update building status by integer input
-	public void build(int a)
-	{
+	public void build(int a) {
 		buildings += a;
 		if (buildings > 5)
 			throw new IllegalArgumentException("Cannot build past hotel!");
 		if (buildings < 0)
 			throw new IllegalArgumentException("Cannot build negative buildings!");
 	}
-	
+
 	//switch status of monopoly
-	public boolean monopoly()
-	{
+	public boolean monopoly() {
 		return monopoly;
 	}
-	
+
 	//cost to purchase property
-	public int cost()
-	{
+	public int cost() {
 		return value;
 	}
 
 	//return number of buildings owned
-	public int numHouses()
-	{
-	    return buildings;
+	public int numHouses() {
+		return buildings;
 	}
-	
+
 	//return cost to purchase one house
-	public int houseCost()
-	{
-	    return houses;
+	public int houseCost() {
+		return houses;
 	}
-	
+
 	//return amount owed
-	public int rent(int val)
-	{
+	public int rent(int val) {
 		if (!owned)
 			return 0;
-		switch(buildings)
-		{
-			case 0: if (monopoly) return 2*rent;
-					return rent;
-			case 1:	return oneH;
-			case 2: return twoH;
-			case 3: return threeH;
-			case 4: return fourH;
-			case 5: return hotel;
-			default: return 0;
+		switch (buildings) {
+			case 0:
+				if (monopoly) return 2 * rent;
+				return rent;
+			case 1:
+				return oneH;
+			case 2:
+				return twoH;
+			case 3:
+				return threeH;
+			case 4:
+				return fourH;
+			case 5:
+				return hotel;
+			default:
+				return 0;
 		}
 	}
 
 	public PlayerType ownerType() {
-        return ownerType;
-    }
+		return ownerType;
+	}
 
 	public Player owner() {
 		return owner;
-    }
+	}
 
-    //mortgage property
+	//mortgage property
 	public int mortgage() {
-		if (mortgaged)
-        {
-            mortgaged = false;
-            return (int) Math.round((value / 2) * 1.1);
-        } else
-        {
-            mortgaged = true;
-            return value / 2;
-        }
-    }
+		if (mortgaged) {
+			mortgaged = false;
+			return (int) Math.round((value / 2) * 1.1);
+		} else {
+			mortgaged = true;
+			return value / 2;
+		}
+	}
 
 	public boolean isMortgaged() {
 		return mortgaged;
-    }
+	}
 
 	public int mortgageCost() {
 		return value / 2;
-    }
+	}
 
 	public void setMonopoly() {
 		monopoly = true;
@@ -225,7 +218,7 @@ public class Property implements Square {
 		return aOkay && bOkay;
 	}
 
-	public String toString(){
+	public String toString() {
 		if (numHouses() == 5)
 			return name + " - Hotel";
 		if (numHouses() > 0)

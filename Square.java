@@ -5,27 +5,27 @@ package monopoly;
  * Interface for squares on monopoly board
  */
 public interface Square {
-    int position();
+	int position();
 
-    String name();
+	String name();
 
-    boolean isOwnable();
+	boolean isOwnable();
 
-    boolean isOwned();
+	boolean isOwned();
 
-    boolean isMortgaged();
+	boolean isMortgaged();
 
-    int cost();
+	int cost();
 
-    void purchase(Player player);
+	void purchase(Player player);
 
-    int rent(int val);
+	int rent(int val);
 
-    int mortgageCost();
+	int mortgageCost();
 
-    int mortgage();
+	int mortgage();
 
-    Player owner();
+	Player owner();
 
-    String toString();
+	String toString();
 }

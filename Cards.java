@@ -7,8 +7,7 @@ public class Cards implements Square {
 	private int pos;
 
 	//construct square of type cards
-	public Cards(String name, int pos, Card.CardType type, Deck deck)
-	{
+	public Cards(String name, int pos, Card.CardType type, Deck deck) {
 		this.deck = deck;
 		if (type != Card.CardType.COMMUNITY && type != Card.CardType.CHANCE)
 			throw new IllegalArgumentException("Card type invalid!");
@@ -48,11 +47,11 @@ public class Cards implements Square {
 	public int mortgage() {
 		return 0;
 	}
+
 	//create deck of community chest cards
-	private void community()
-	{
+	private void community() {
 		Card[] cards = new Card[DECK_SIZE];
-		
+
 		for (int i = 0; i < DECK_SIZE; i++)
 			cards[i] = new Card(Card.CardType.COMMUNITY, i);
 
@@ -60,10 +59,9 @@ public class Cards implements Square {
 	}
 
 	//create deck of chance cards
-	private void chance()
-	{
+	private void chance() {
 		Card[] cards = new Card[DECK_SIZE];
-		
+
 		for (int i = 0; i < DECK_SIZE; i++)
 			cards[i] = new Card(Card.CardType.CHANCE, i);
 
@@ -71,14 +69,12 @@ public class Cards implements Square {
 	}
 
 	//draw next card
-	public Card draw()
-	{
+	public Card draw() {
 		return deck.drawCard();
 	}
 
-	public int size()
-	{
-	    return DECK_SIZE;
+	public int size() {
+		return DECK_SIZE;
 	}
 
 	public int cost() {
@@ -96,5 +92,7 @@ public class Cards implements Square {
 		return null;
 	}
 
-	public String toString() { return name; }
+	public String toString() {
+		return name;
+	}
 }

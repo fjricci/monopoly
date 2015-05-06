@@ -1,7 +1,6 @@
 package monopoly;
 
-public class ValueEstimator
-{
+public class ValueEstimator {
  /*   private Queue<Player.PlayerType> playerQueue; //contains all player enums
     private Queue<Integer> posQueue;  //contains all player positions
     private Board board;  //stores a board

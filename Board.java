@@ -1,12 +1,11 @@
 package monopoly;
 
-public class Board
-{
+public class Board {
 	private final int N = 40;
 	private Square[] board; //representation of board
 	private Deck chance;
 	private Deck community;
-	
+
 	//constructor for a new board of squares
 	public Board(Deck chance, Deck community) {
 		board = new Square[N];
@@ -35,10 +34,10 @@ public class Board
 	public Square square(int pos) {
 		return board[pos];
 	}
-	
+
 	//return an array of the squares on the board
 	public Square[] getBoard() {
-	    return board;
+		return board;
 	}
 
 	private Square makeSquare(int pos) {

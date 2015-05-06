@@ -52,19 +52,17 @@ public class Taxes implements Square {
 	}
 
 	//return fixed rate tax owed
-	public int tax()
-	{
+	public int tax() {
 		return fixTax;
 	}
-	
+
 	//return variable tax owed, based on value of player's assets
-	public int tax(int value)
-	{
+	public int tax(int value) {
 		//if no variable tax option, return fixed tax value
 		if (varTax == 0)
 			return fixTax;
 		double percent = varTax / 100;
-		return (int) (value*percent);
+		return (int) (value * percent);
 	}
 
 	public int cost() {

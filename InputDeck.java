@@ -19,7 +19,7 @@ public class InputDeck implements Deck {
 		input = new Input();
 	}
 
-	public void initialize(Card[] cards){
+	public void initialize(Card[] cards) {
 		SIZE = cards.length;
 		deck.addAll(Arrays.asList(cards));
 		Collections.shuffle(deck);
@@ -45,5 +45,6 @@ public class InputDeck implements Deck {
 		return deck.get(card);
 	}
 
-	public void returnOutOfJail() {}
+	public void returnOutOfJail() {
+	}
 }
