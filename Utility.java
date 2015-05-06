@@ -64,9 +64,9 @@ public class Utility implements Square {
 			roll = dice.roll().val;
 
 		if (owner.equals(other.owner()))
-			return ONE * roll;
+			return TWO * roll;
 
-		return TWO * roll;
+		return ONE * roll;
 	}
 
 	//return total utilities owned by player owning this utility
