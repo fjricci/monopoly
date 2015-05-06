@@ -568,6 +568,7 @@ public class Monopoly {
 		}
 	}
 
+	//todo double rail, 10 util
 	private void drawCard(Player player, Cards cards) {
 		int numString = 3;
 		Card card = cards.draw();
@@ -828,7 +829,7 @@ public class Monopoly {
 	private void printState() {
 		int counter = 1;
 		for (Player player : players) {
-			System.out.println("----------------------------------------");
+			System.out.println("--------------------------------------------------");
 			System.out.println("Player " + counter++);
 			System.out.printf("%-10s%40s%n", "Name", player.name());
 			System.out.printf("%-10s%40s%n", "Money", player.getMoney());
@@ -847,7 +848,7 @@ public class Monopoly {
 
 			if (player.numJailFree() > 0)
 				System.out.println(player.numJailFree() + " out of jail free cards");
-			System.out.println("----------------------------------------");
+			System.out.println("--------------------------------------------------");
 		}
 	}
 }
