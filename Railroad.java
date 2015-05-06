@@ -18,11 +18,27 @@ public class Railroad implements Square {
 	private String name;
 	private int pos;
 
+	private Railroad[] others = new Railroad[3];
+
 	//constructor
 	public Railroad(String name, int pos) {
 		numOwned = 1;
 		this.name = name;
 		this.pos = pos;
+	}
+
+	public void createGroup(Railroad a, Railroad b, Railroad c){
+		others[0] = a;
+		others[1] = b;
+		others[2] = c;
+	}
+
+	public void updateOwners(){
+		numOwned = 1;
+		for (Railroad r : others){
+			if (r.owner().equals(owner))
+				numOwned++;
+		}
 	}
 
 	public int position() {
@@ -38,23 +54,18 @@ public class Railroad implements Square {
 		owned = true;
 		owner = player;
 		ownerType = player.getPlayer();
+
+		updateOwners();
 	}
 
 	public boolean isOwnable() {
 		return true;
 	}
 
-	//update total number of railroads owned by a player
-	public void owned(int owned) {
-		if (owned < 0)
-			throw new IllegalArgumentException("Cannot own negative properties!");
-		if (owned > 4)
-			throw new IllegalArgumentException("Cannot own more than four railroads!");
-		numOwned = owned;
-	}
-
 	//return rent owed
 	public int rent(int val) {
+		updateOwners();
+
 		switch (numOwned) {
 			case 1:
 				return ONE;
@@ -73,10 +84,6 @@ public class Railroad implements Square {
 		return owned;
 	}
 
-	public PlayerType ownerType() {
-		return ownerType;
-	}
-
 	public Player owner() {
 		return owner;
 	}
@@ -87,6 +94,8 @@ public class Railroad implements Square {
 
 	//mortgage or unmortgage property
 	public int mortgage() {
+		updateOwners();
+
 		if (mortgaged) {
 			mortgaged = false;
 			return (int) Math.round((COST / 2) * 1.1);

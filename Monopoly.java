@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 
 public class Monopoly {
 	private final boolean deterministic;
+	private boolean chanceBoost = false;
 	private Dice dice; //two six-sided dice
 	private Board board; //game board
 	private Deck chance;
@@ -509,6 +510,11 @@ public class Monopoly {
 
 	private void owned(Player player, Square square, int val) {
 		int cost = square.rent(val);
+		if (square instanceof Utility && chanceBoost)
+			cost = ((Utility) square).increasedRent();
+		else if (square instanceof Railroad && chanceBoost)
+			cost *= 2;
+		chanceBoost = false;
 		Player owner = square.owner();
 		if (player.getPlayer() == owner.getPlayer())
 			return;
@@ -616,6 +622,8 @@ public class Monopoly {
 			default:
 				break;
 		}
+
+		chanceBoost = card.increased();
 
 		if (initialPos == player.position())
 			return;

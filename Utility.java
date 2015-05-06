@@ -18,6 +18,8 @@ public class Utility implements Square {
 	private String name;
 	private int pos;
 
+	private Utility other;
+
 	//utility constructor
 	public Utility(String name, int pos) {
 		numOwned = 0;
@@ -25,6 +27,10 @@ public class Utility implements Square {
 		this.name = name;
 		this.pos = pos;
 		this.dice = new InputDice(new Input());
+	}
+
+	public int increasedRent() {
+		return 10 * dice.roll().val;
 	}
 
 	public int position() {

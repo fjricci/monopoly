@@ -16,6 +16,7 @@ public class Board {
 			board[i] = makeSquare(i);
 
 		makeGroups();
+		makeRail();
 	}
 
 	public int size() {
@@ -136,6 +137,18 @@ public class Board {
 		makeGroup("Atlantic Avenue", "Ventor Avenue", "Marvin Gardens");
 		makeGroup("Pennsylvania Avenue", "North Carolina Avenue", "Pacific Avenue");
 		makeGroup("Park Place", "Boardwalk");
+	}
+
+	private void makeRail() {
+		Railroad a = (Railroad) square(5);
+		Railroad b = (Railroad) square(15);
+		Railroad c = (Railroad) square(25);
+		Railroad d = (Railroad) square(35);
+
+		a.createGroup(b, c, d);
+		b.createGroup(a, c, d);
+		c.createGroup(a, b, d);
+		d.createGroup(a, b, c);
 	}
 
 	private void makeGroup(String nameA, String nameB) {
