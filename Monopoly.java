@@ -79,6 +79,7 @@ public class Monopoly {
 			try {
 				players.forEach(this::turn);
 			} catch (Exception e) {
+				System.out.println(e.getMessage());
 				System.out.println("Early Termination initiated.");
 				return;
 			} finally {

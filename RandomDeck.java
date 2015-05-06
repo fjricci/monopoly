@@ -17,6 +17,8 @@ public class RandomDeck implements Deck {
 	}
 
 	public void initialize(Card[] cards) {
+		if (!deck.isEmpty())
+			return;
 		SIZE = cards.length;
 		deck.addAll(Arrays.asList(cards));
 		Collections.shuffle(deck);
@@ -31,8 +33,8 @@ public class RandomDeck implements Deck {
 		Card card = deck.get(current++);
 		if (card.outJailFree() && outOfJailFree)
 			outOfJailFree = false;
-		else
-			card = deck.get(current++); //can't use out of jail free if in use
+		else if (card.outJailFree())
+			return drawCard(); //can't use out of jail free if in use
 		return card;
 	}
 
