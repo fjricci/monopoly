@@ -805,17 +805,17 @@ public class Monopoly {
 		for (Player player : players) {
 			System.out.println("----------------------------------------");
 			System.out.println("Player " + counter++);
-			System.out.printf("%-10s%30s%n", "Name", player.name());
-			System.out.printf("%-10s%30s%n", "Money", player.getMoney());
-			System.out.printf("%-10s%30s%n", "Position", player.position());
+			System.out.printf("%-10s%40s%n", "Name", player.name());
+			System.out.printf("%-10s%40s%n", "Money", player.getMoney());
+			System.out.printf("%-10s%40s%n", "Position", player.position());
 			System.out.printf("%-10s", "Properties");
 			Queue<Square> owned = player.properties();
 			if (owned.isEmpty())
-				System.out.printf("%30s%n", "none");
+				System.out.printf("%40s%n", "none");
 			else
-				System.out.printf("%30s%n", owned.remove().name());
+				System.out.printf("%40s%n", owned.remove());
 			for (Square s : owned)
-				System.out.printf("%40s%n", s.name());
+				System.out.printf("%50s%n", s);
 			System.out.println("----------------------------------------");
 		}
 	}

@@ -2,7 +2,9 @@ package monopoly;
 
 import monopoly.Player.PlayerType;
 
+import java.util.Formatter;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
@@ -221,5 +223,15 @@ public class Property implements Square {
 		boolean bOkay = bDiff == 0 || bDiff == -1;
 
 		return aOkay && bOkay;
+	}
+
+	public String toString(){
+		if (numHouses() == 5)
+			return name + " - Hotel";
+		if (numHouses() > 0)
+			return name + " - " + numHouses() + " Houses";
+		if (mortgaged)
+			return name + " Mortgaged";
+		return name;
 	}
 }
