@@ -1,7 +1,5 @@
 package monopoly;
 
-import static monopoly.Player.PlayerType;
-
 public class Railroad implements Square {
 	//rent, given number of railroads owned by a player
 	private final int ONE = 25;
@@ -10,7 +8,6 @@ public class Railroad implements Square {
 	private final int FOUR = 200;
 	private final int COST = 200;
 	private int numOwned;  //number of railroads owned by a player
-	private PlayerType ownerType;
 	private Player owner;
 	private boolean owned;  //is property owned?
 	private boolean mortgaged;
@@ -36,7 +33,7 @@ public class Railroad implements Square {
 	public void updateOwners(){
 		numOwned = 1;
 		for (Railroad r : others){
-			if (r.owner().equals(owner))
+			if (r.isOwned() && r.owner().equals(owner))
 				numOwned++;
 		}
 	}
@@ -53,7 +50,6 @@ public class Railroad implements Square {
 	public void purchase(Player player) {
 		owned = true;
 		owner = player;
-		ownerType = player.getPlayer();
 
 		updateOwners();
 	}

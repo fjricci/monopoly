@@ -20,6 +20,9 @@ public class InputDeck implements Deck {
 	}
 
 	public void initialize(Card[] cards) {
+		if (!deck.isEmpty())
+			return;
+
 		SIZE = cards.length;
 		deck.addAll(Arrays.asList(cards));
 		Collections.shuffle(deck);

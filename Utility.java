@@ -29,6 +29,10 @@ public class Utility implements Square {
 		this.dice = new InputDice(new Input());
 	}
 
+	public void setOther(Utility other) {
+		this.other = other;
+	}
+
 	public int increasedRent() {
 		return 10 * dice.roll().val;
 	}
@@ -54,30 +58,15 @@ public class Utility implements Square {
 		player.properties().stream().filter(s -> s instanceof Utility).forEach(s -> numOwned++);
 	}
 
-	//update number of utilities owned by a player
-	public void owned(int owned) {
-		if (owned < 0)
-			throw new IllegalArgumentException("Cannot own "
-					                                   + "negative properties!");
-		if (owned > 2)
-			throw new IllegalArgumentException("Cannot own more "
-					                                   + "than two utilities!");
-		numOwned = owned;
-	}
-
 	//return rent on utility, given a roll
 	public int rent(int roll) {
 		if (roll == 0)
 			roll = dice.roll().val;
 
-		switch (numOwned) {
-			case 1:
-				return ONE * roll;
-			case 2:
-				return TWO * roll;
-			default:
-				return 0;
-		}
+		if (owner.equals(other.owner()))
+			return ONE * roll;
+
+		return TWO * roll;
 	}
 
 	//return total utilities owned by player owning this utility

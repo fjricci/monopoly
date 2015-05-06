@@ -36,6 +36,7 @@ import monopoly.Jail.JailType;
 import monopoly.Player.PlayerType;
 
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
@@ -78,8 +79,7 @@ public class Monopoly {
 		while (players.size() > 1) {
 			try {
 				players.forEach(this::turn);
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
+			} catch (NoSuchElementException e) {
 				System.out.println("Early Termination initiated.");
 				return;
 			} finally {
@@ -260,7 +260,7 @@ public class Monopoly {
 
 		if (!owned && ownable)
 			unowned(player, sq);
-		else if (ownable)
+		else if (ownable && !sq.isMortgaged())
 			owned(player, sq, roll);
 		else if (sq instanceof Taxes)
 			payTax(player, (Taxes) sq, sq);
@@ -419,7 +419,7 @@ public class Monopoly {
 				cost = additionalFunds(cost, player, bank);
 				if (cost == Integer.MIN_VALUE)
 					return;
-				if (cost < 0) {
+				if (cost <= 0) {
 					player.excMoney(cost * -1);
 					break;
 				}
@@ -453,7 +453,7 @@ public class Monopoly {
 					cost = additionalFunds(cost, player, bank);
 					if (cost == Integer.MIN_VALUE)
 						return;
-					if (cost < 0) {
+					if (cost <= 0) {
 						player.excMoney(cost * -1);
 						break;
 					}
@@ -534,7 +534,7 @@ public class Monopoly {
 				cost = additionalFunds(cost, player, owner);
 				if (cost == Integer.MIN_VALUE)
 					return;
-				if (cost < 0) {
+				if (cost <= 0) {
 					player.excMoney(cost * -1);
 					break;
 				}
@@ -567,7 +567,7 @@ public class Monopoly {
 				cost = additionalFunds(cost, player, bank);
 				if (cost == Integer.MIN_VALUE)
 					return;
-				if (cost < 0) {
+				if (cost <= 0) {
 					player.excMoney(cost * -1);
 					break;
 				}
@@ -575,7 +575,6 @@ public class Monopoly {
 		}
 	}
 
-	//todo double rail, 10 util
 	private void drawCard(Player player, Cards cards) {
 		int numString = 3;
 		Card card = cards.draw();
@@ -700,7 +699,7 @@ public class Monopoly {
 				val = additionalFunds(val, player, new Player(PlayerType.BANK, "Bank"));
 				if (val == Integer.MIN_VALUE)
 					return;
-				if (val < 0) {
+				if (val <= 0) {
 					player.excMoney(val * -1);
 					break;
 				}
@@ -737,6 +736,12 @@ public class Monopoly {
 	private int additionalFunds(int cost, Player player, Player owner) {
 		Queue<Square> props = availableAssets(player);
 		int availableAssets = totalVal(props) + player.getMoney();
+
+		if (cost <= player.getMoney()) {
+			player.excMoney(-1 * cost);
+			owner.excMoney(cost);
+			return 0;
+		}
 
 		if (availableAssets < cost) {
 			lose(player, owner);

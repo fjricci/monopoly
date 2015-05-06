@@ -17,6 +17,7 @@ public class Board {
 
 		makeGroups();
 		makeRail();
+		makeUtil();
 	}
 
 	public int size() {
@@ -149,6 +150,14 @@ public class Board {
 		b.createGroup(a, c, d);
 		c.createGroup(a, b, d);
 		d.createGroup(a, b, c);
+	}
+
+	private void makeUtil() {
+		Utility a = (Utility) square(12);
+		Utility b = (Utility) square(28);
+
+		a.setOther(b);
+		b.setOther(a);
 	}
 
 	private void makeGroup(String nameA, String nameB) {
