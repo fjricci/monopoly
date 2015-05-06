@@ -103,4 +103,6 @@ public class Railroad implements Square {
     public int mortgageCost() {
         return COST / 2;
     }
+
+    public String toString() { return name; }
 }

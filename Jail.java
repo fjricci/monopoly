@@ -64,4 +64,6 @@ public class Jail implements Square {
 	public enum JailType {
 		VISITING, TO_JAIL
 	}
+
+	public String toString() { return name; }
 }

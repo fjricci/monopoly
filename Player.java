@@ -16,15 +16,17 @@ public class Player
 	private boolean inJail;
 	private int jailTurn;
 	private int numJailFree;
+	private boolean chanceFree;
 	public Player(PlayerType player, String playerName)
 	{
 		money = 1500;
-		properties = new LinkedList<Square>();
+		properties = new LinkedList<>();
 		position = 0;
 		this.player = player;
 		this.playerName = playerName;
 		inJail = false;
 		numJailFree = 0;
+		chanceFree = false;
 	}
 
 	public void addProperty(Square square)
@@ -74,7 +76,7 @@ public class Player
 	
 	public Queue<Square> properties()
 	{
-	    Queue<Square> tempProp = new LinkedList<Square>();
+	    Queue<Square> tempProp = new LinkedList<>();
 	    for (Square s : properties)
 	        tempProp.add(s);
 	    return tempProp;
@@ -92,7 +94,7 @@ public class Player
 	
 	public Queue<Integer> propIDs()
     {
-	    Queue<Integer> queue = new LinkedList<Integer>();
+	    Queue<Integer> queue = new LinkedList<>();
 	    for (Square s : properties)
 		    queue.add(s.position());
 	    return queue;
@@ -135,17 +137,21 @@ public class Player
 	    return inJail;
 	}
 	
-	public void addJailFree()
+	public void addJailFree(boolean chance)
 	{
 	    numJailFree++;
+		chanceFree = chance;
 	}
 	
-	public void useJailFree()
+	public boolean useJailFree()
 	{
 	    if (numJailFree < 1)
-	        throw new IllegalArgumentException("You do not have any cards!");
-	    else
-	        numJailFree--;
+	        throw new RuntimeException("You do not have any cards!");
+
+		numJailFree--;
+		boolean deck = chanceFree;
+		chanceFree = !chanceFree;
+		return deck;
 	}
 	
 	public int numJailFree()

@@ -2,15 +2,14 @@ package monopoly;
 
 public class Cards implements Square {
 	private final int DECK_SIZE = 16; //16 cards in either type of deck
-	private final boolean deterministic;
 	private Deck deck; //store deck of cards
 	private String name;
 	private int pos;
 
 	//construct square of type cards
-	public Cards(String name, int pos, Card.CardType type, boolean deterministic)
+	public Cards(String name, int pos, Card.CardType type, Deck deck)
 	{
-		this.deterministic = deterministic;
+		this.deck = deck;
 		if (type != Card.CardType.COMMUNITY && type != Card.CardType.CHANCE)
 			throw new IllegalArgumentException("Card type invalid!");
 		if (type == Card.CardType.CHANCE)
@@ -55,13 +54,9 @@ public class Cards implements Square {
 		Card[] cards = new Card[DECK_SIZE];
 		
 		for (int i = 0; i < DECK_SIZE; i++)
-		{
 			cards[i] = new Card(Card.CardType.COMMUNITY, i);
-		}
-		if (deterministic)
-			deck = new InputDeck(cards);
-		else
-			deck = new RandomDeck(cards);
+
+		deck.initialize(cards);
 	}
 
 	//create deck of chance cards
@@ -70,13 +65,9 @@ public class Cards implements Square {
 		Card[] cards = new Card[DECK_SIZE];
 		
 		for (int i = 0; i < DECK_SIZE; i++)
-		{
 			cards[i] = new Card(Card.CardType.CHANCE, i);
-		}
-		if (deterministic)
-			deck = new InputDeck(cards);
-		else
-			deck = new RandomDeck(cards);
+
+		deck.initialize(cards);
 	}
 
 	//draw next card
@@ -104,4 +95,6 @@ public class Cards implements Square {
 	public Player owner() {
 		return null;
 	}
+
+	public String toString() { return name; }
 }

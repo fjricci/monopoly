@@ -9,17 +9,20 @@ import java.util.Collections;
  * Manual card input
  */
 public class InputDeck implements Deck {
-	private final int SIZE; //store number of cards
+	private int SIZE; //store number of cards
 	private ArrayList<Card> deck; //store array of cards
 	private Input input;  //store current card
 
 	//create shuffled deck of cards
-	public InputDeck(Card[] cards) {
+	public InputDeck() {
 		deck = new ArrayList<>();
+		input = new Input();
+	}
+
+	public void initialize(Card[] cards){
 		SIZE = cards.length;
 		deck.addAll(Arrays.asList(cards));
 		Collections.shuffle(deck);
-		input = new Input();
 	}
 
 	//draw next card from deck
@@ -41,4 +44,6 @@ public class InputDeck implements Deck {
 
 		return deck.get(card);
 	}
+
+	public void returnOutOfJail() {}
 }

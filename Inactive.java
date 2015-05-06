@@ -51,4 +51,6 @@ public class Inactive implements Square {
     public Player owner() {
         return null;
     }
+
+    public String toString() { return name; }
 }

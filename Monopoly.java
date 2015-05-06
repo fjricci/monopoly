@@ -22,10 +22,10 @@
  * Utility.java
  * <p>
  * Execution:
- * monopoly.Monopoly N
+ * monopoly.Monopoly
  * <p>
  * Purpose:
- * Run a text-based Monopoly game emulator, with N human players.
+ * Run a text-based Monopoly game emulator.
  * <p>
  * ***************************************************************************
  */
@@ -43,6 +43,8 @@ public class Monopoly {
 	private final boolean deterministic;
 	private Dice dice; //two six-sided dice
 	private Board board; //game board
+	private Deck chance;
+	private Deck community;
 	private Input input;
 	private Queue<Player> players;
 
@@ -52,12 +54,18 @@ public class Monopoly {
 
 		System.out.println("Would you like to provide your own dice and card input?");
 		deterministic = input.inputBool();
-		if (deterministic)
+		if (deterministic) {
 			dice = new InputDice(input);
-		else
+			chance = new InputDeck();
+			community = new InputDeck();
+		}
+		else {
 			dice = new ProbDice(); //two dice, six sided
+			chance = new RandomDeck();
+			community = new RandomDeck();
+		}
 
-		board = new Board(deterministic); //create new board
+		board = new Board(chance, community); //create new board
 		initialize();
 	}
 
@@ -161,6 +169,27 @@ public class Monopoly {
 		System.out.println("It's " + player.name() + "'s turn");
 		int double_count = 0;
 		while (true) {
+			if (player.inJail()) {
+				System.out.println("Would you like to get out of jail using cash or card?");
+				if (input.inputBool()){
+					System.out.println("Select cash or card.");
+					int choice = input.inputDecision(new String[]{"cash", "card"});
+					if (choice == 0) {
+						player.excMoney(-50);
+						player.leaveJail();
+					}
+					else if (player.numJailFree() > 0) {
+						if (player.useJailFree())
+							chance.returnOutOfJail();
+						else
+							community.returnOutOfJail();
+						player.leaveJail();
+					}
+					else
+						System.out.println("You don't have any cards.");
+				}
+			}
+
 			Dice.Roll roll = dice.roll();
 			if (roll.is_double)
 				double_count++;
@@ -584,7 +613,7 @@ public class Monopoly {
 				streetRepairs(player, card.house(), card.hotel());
 				break;
 			case OUT_JAIL:
-				player.addJailFree();
+				player.addJailFree(card.type() == Card.CardType.CHANCE);
 				break;
 			default:
 				break;
@@ -793,10 +822,9 @@ public class Monopoly {
 			squares.remove();
 		}
 		winner.excMoney(loser.getMoney());
-		while (loser.numJailFree() > 0) {
-			loser.useJailFree();
-			winner.addJailFree();
-		}
+		while (loser.numJailFree() > 0)
+			winner.addJailFree(loser.useJailFree());
+
 		players.remove(loser);
 	}
 
@@ -816,6 +844,12 @@ public class Monopoly {
 				System.out.printf("%40s%n", owned.remove());
 			for (Square s : owned)
 				System.out.printf("%50s%n", s);
+
+			if (player.inJail())
+				System.out.println("In jail");
+
+			if (player.numJailFree() > 0)
+				System.out.println(player.numJailFree() + " out of jail free cards");
 			System.out.println("----------------------------------------");
 		}
 	}

@@ -118,4 +118,5 @@ public class Utility implements Square {
         return COST / 2;
     }
 
+    public String toString() { return name; }
 }

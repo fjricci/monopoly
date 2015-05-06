@@ -6,4 +6,8 @@ package monopoly;
  */
 public interface Deck {
 	Card drawCard();
+
+	void initialize(Card[] cards);
+
+	void returnOutOfJail();
 }

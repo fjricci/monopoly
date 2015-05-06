@@ -3,13 +3,15 @@ package monopoly;
 public class Board
 {
 	private final int N = 40;
-	private final boolean deterministic;
 	private Square[] board; //representation of board
+	private Deck chance;
+	private Deck community;
 	
 	//constructor for a new board of squares
-	public Board(boolean deterministic) {
-		this.deterministic = deterministic;
+	public Board(Deck chance, Deck community) {
 		board = new Square[N];
+		this.chance = chance;
+		this.community = community;
 		//initialize board squares
 		for (int i = 0; i < N; i++)
 			board[i] = makeSquare(i);
@@ -190,7 +192,7 @@ public class Board
 	}
 
 	private Square chance(String name, int pos) {
-		return new Cards(name, pos, Card.CardType.CHANCE, deterministic);
+		return new Cards(name, pos, Card.CardType.CHANCE, chance);
 	}
 
 	private Square reading(String name, int pos) {
@@ -202,7 +204,7 @@ public class Board
 	}
 
 	private Square community(String name, int pos) {
-		return new Cards(name, pos, Card.CardType.COMMUNITY, deterministic);
+		return new Cards(name, pos, Card.CardType.COMMUNITY, community);
 	}
 
 	private Square go(String name, int pos) {
