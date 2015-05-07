@@ -600,6 +600,7 @@ public class Monopoly {
 			case PLAYER_MONEY:
 				player.excMoney(card.eachPlayer());
 				allPlayers(-1 * card.eachPlayer());
+				player.excMoney(card.eachPlayer());
 				break;
 			case MOVE:
 				player.move(card.travel());
