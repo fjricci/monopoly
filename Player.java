@@ -50,7 +50,7 @@ public class Player {
 	}
 
 	public void moveTo(int pos) {
-		if (pos < position)
+		if (pos < position && !inJail)
 			excMoney(200);
 		position = pos;
 
