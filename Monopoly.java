@@ -598,9 +598,7 @@ public class Monopoly {
 				player.excMoney(card.value());
 				break;
 			case PLAYER_MONEY:
-				player.excMoney(card.eachPlayer());
-				allPlayers(-1 * card.eachPlayer());
-				player.excMoney(card.eachPlayer());
+				allPlayers(-1 * card.eachPlayer(), player);
 				break;
 			case MOVE:
 				player.move(card.travel());
@@ -708,9 +706,9 @@ public class Monopoly {
 		}
 	}
 
-	private void allPlayers(int value) {
-		for (Player player : players)
-			player.excMoney(value);
+	private void allPlayers(int value, Player player) {
+		player.excMoney(-1 * (players.size() - 1) * value);
+		players.stream().filter(p -> !p.equals(player)).forEach(p -> p.excMoney(value));
 	}
 
 	private void jailInteraction(Player player, Jail jail) {
