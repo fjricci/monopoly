@@ -200,7 +200,8 @@ public class Monopoly {
 				} else {
 					if (!player.stayJail())
 						leaveJail(player);
-					break;
+					else
+						break;
 				}
 			}
 
