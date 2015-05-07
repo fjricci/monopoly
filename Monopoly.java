@@ -219,7 +219,7 @@ public class Monopoly {
 
 			handleSquare(player, square[pos], roll.val);
 
-			if (!roll.is_double)
+			if (!roll.is_double && !player.inJail())
 				break;
 		}
 
