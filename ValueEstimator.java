@@ -11,9 +11,10 @@ public class ValueEstimator {
     private ProbDice probDice;   //stores a pair of six-sided probDice
     private Cards chance; //stores a deck of chance cards
     private double[] doubleProb;
-    
-    //constructs ValueEstimator object
-    public ValueEstimator(Board board, Queue<Player> queue,
+	private double[] singleProb;
+
+	//constructs ValueEstimator object
+	public ValueEstimator(Board board, Queue<Player> queue,
                           Player player, ProbDice probDice, Cards chance)
     {
         posQueue = new LinkedList<>();
@@ -71,18 +72,13 @@ public class ValueEstimator {
         for (double prob : probs)
 	        System.out.println(prob);*/
 	    double totProb = 0;
-	    for (int i = 0; i < 40; i++) {
+	    double[] tmp = {1.212, 0, 2.384, 5.556, 9.322, 12.153, 13.836, 6.250, 13.836, 11.111, 8.280, 6.597, 3.766, 0, 0, 2.083, 0, 0, 0, 0, 0, 0, 0, 0, 1.042, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.042, 1.531};
+	    for (int i = 0; i < 41; i++) {
 		    double prob = value.getProb(i, 0, board.square(i));
-		    System.out.println(prob);
+		    System.out.println(i + ") " + prob * 100 + " | " + tmp[i]);
 		    totProb += prob;
 	    }
 	    System.out.println("Tot prob: " + totProb);
-	    double[] tmp = {1.212, 0, 2.384, 5.556, 9.322, 12.153, 13.836, 6.250, 13.836, 11.111, 8.280, 6.597, 3.766, 0, 0, 2.083, 0, 0, 0, 0, 0, 0, 0, 0, 1.042, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.042, 1.531};
-	    double collTot = 0;
-	    for (double d : tmp)
-		    collTot += d / 100;
-	    System.out.println("Collins sum: " + collTot);
-	    System.out.println("Collins length: " + tmp.length);
     }
     
     //return the probability of a given number of players landing
@@ -144,15 +140,12 @@ public class ValueEstimator {
 	        squarePos += board.size(); //accounts for passing go
 	    int dist = squarePos - playerPos;
 
-	    double prob;
+	    double prob = 0;
 	    if (square instanceof Cards)
 		    return cardProb(dist, square);
-	    else
+	    else if (squarePos < 40)
 		    prob = directProb(dist);
 
-	    System.out.println(
-			    "Square: " + squarePos + " | Direct: " + prob + " | Indirect: " + indirectProb(squarePos, playerPos,
-			                                                                                   square));
         prob += indirectProb(squarePos, playerPos, square);
         return prob;
     }
@@ -168,7 +161,8 @@ public class ValueEstimator {
     //probability of landing directly on property by probDice roll
     private double directProb(int dist)
     {
-        return doubleProb(dist);
+	    //return doubleProb(dist);
+	    return singleProb(dist);
     }
     
     //probability of landing on property by chance card
@@ -185,7 +179,7 @@ public class ValueEstimator {
 		int comPosB = 17;
 		int comPosC = 33;
 
-		if (squarePos != 0)
+		if (squarePos != 0 && squarePos != 40)
 			return 0;
 
 		if (comPosA < playerPos)
@@ -235,19 +229,21 @@ public class ValueEstimator {
 		for (Card card : chance.cards()) {
 			if (card.travelTo() == squarePos)
 				prob += probChance / SIZE;
-			else if (card.travel() == squarePos - playerPos)
-				prob += probChance / SIZE;
+			else if (card.travel() == squarePos - chancePosA)
+				prob += probChanceA / SIZE;
+			else if (card.travel() == squarePos - chancePosB)
+				prob += probChanceB / SIZE;
+			else if (card.travel() == squarePos - chancePosC)
+				prob += probChanceC / SIZE;
 			prob += moveNearest(card, square, probChanceA, probChanceB, probChanceC) / SIZE;
 		}
 
+		if (prob != 0)
+			System.out.println("Chance prob: " + prob);
 		return prob;
 	}
 
 	private double moveNearest(Card card, Square square, double probA, double probB, double probC) {
-		int chancePosA = 7;
-		int chancePosB = 22;
-		int chancePosC = 36;
-
 		if (card.action() != Card.CardAction.MOVE_NEAREST)
 			return 0;
 
@@ -256,13 +252,13 @@ public class ValueEstimator {
 				return 0;
 			switch (square.position()) {
 				case 5:
-					return probA;
+					return probC;
 				case 15:
-					return 0;
+					return probA;
 				case 25:
 					return probB;
 				case 35:
-					return probC;
+					return 0;
 				default:
 					throw new RuntimeException("Impossible railroad position.");
 			}
@@ -273,9 +269,9 @@ public class ValueEstimator {
 				return 0;
 			switch (square.position()) {
 				case 12:
-					return probA;
+					return probA + probC;
 				case 28:
-					return probB + probC;
+					return probB;
 				default:
 					throw new RuntimeException("Impossible utility position.");
 			}
@@ -295,6 +291,7 @@ public class ValueEstimator {
         int[] tripleWays = new int[MAX];
 
         doubleProb = new double[MAX];
+	    singleProb = new double[13];
 
         ways[2] = 1;
         ways[3] = 2;
@@ -363,8 +360,16 @@ public class ValueEstimator {
 
         for (int i = 0; i < MAX; i++)
 	        doubleProb[i] = (ways[i] + doubleWays[i] / D + tripleWays[i] / T) / MAX;
+
+	    for (int i = 0; i < 13; i++)
+		    singleProb[i] = ways[i] / 36.0;
     }
 
+	public double singleProb(int roll) {
+		if (roll < 2 || roll > 12)
+			return 0.0;
+		return singleProb[roll];
+	}
 
     public double doubleProb(int roll) {
         if (roll < 2 || roll > 35)
@@ -392,16 +397,12 @@ public class ValueEstimator {
         int numWays = 0;
 
         int k = 0;
-        while (true)
-        {
-            int j = 0;
-            while (true)
-            {
-                if (SIDES * k + j == total - N) {
-                    numWays += Prob.combi(N, k) * Prob.combi(-N, j)
-                            * Math.pow(-1, k + j);
-                }
-                if (j > total - N)
+	    while (true) {
+		    int j = 0;
+		    while (true) {
+			    if (SIDES * k + j == total - N)
+				    numWays += Prob.combi(N, k) * Prob.combi(-N, j) * Math.pow(-1, k + j);
+			    if (j > total - N)
                     break;
                 j++;
             }

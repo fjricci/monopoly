@@ -95,6 +95,7 @@ public class Player {
 
 	public void toJail() {
 		inJail = true;
+		move(40);
 		jailTurn = 0;
 	}
 
@@ -109,6 +110,7 @@ public class Player {
 
 	public void leaveJail() {
 		inJail = false;
+		moveTo(10);
 	}
 
 	public boolean inJail() {

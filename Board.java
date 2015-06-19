@@ -1,7 +1,7 @@
 package monopoly;
 
 public class Board {
-	private final int N = 40;
+	private final int N = 41;
 	private Square[] board; //representation of board
 	private Deck chance;
 	private Deck community;
@@ -65,7 +65,7 @@ public class Board {
 			case 9:
 				return connecticut("Connecticut Avenue", pos);
 			case 10:
-				return jail("Jail", pos);
+				return visiting("Just Visiting", pos);
 			case 11:
 				return charles("St. Charles Place", pos);
 			case 12:
@@ -124,6 +124,8 @@ public class Board {
 				return luxury("Luxury Tax", pos);
 			case 39:
 				return boardwalk("Boardwalk", pos);
+			case 40:
+				return jail("In Jail", pos);
 			default:
 				return null;
 		}
@@ -208,8 +210,12 @@ public class Board {
 		return new Utility(name, pos);
 	}
 
-	private Square jail(String name, int pos) {
+	private Square visiting(String name, int pos) {
 		return new Jail(name, pos, Jail.JailType.VISITING);
+	}
+
+	private Square jail(String name, int pos) {
+		return new Jail(name, pos, Jail.JailType.IN_JAIL);
 	}
 
 	private Square chance(String name, int pos) {

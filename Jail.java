@@ -7,8 +7,6 @@ public class Jail implements Square {
 	private String name;
 
 	public Jail(String name, int pos, JailType type) {
-		if (type != JailType.VISITING && type != JailType.TO_JAIL)
-			throw new IllegalArgumentException("Jail type invalid!");
 		this.type = type;
 		this.name = name;
 		this.pos = pos;
@@ -66,6 +64,6 @@ public class Jail implements Square {
 	}
 
 	public enum JailType {
-		VISITING, TO_JAIL
+		VISITING, IN_JAIL, TO_JAIL
 	}
 }

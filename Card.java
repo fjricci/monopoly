@@ -120,7 +120,7 @@ public class Card {
 	private void jail() {
 		action = CardAction.MOVE_TO;
 		textA = "Go to Jail";
-		travelTo = 30;
+		travelTo = 40;
 	}
 
 	private void services() {

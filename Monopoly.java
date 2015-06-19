@@ -719,18 +719,15 @@ public class Monopoly {
 	}
 
 	private void toJail(Player player) {
-		int JAIL_POS = 30;
 		System.out.println("Go to Jail!");
-		player.moveTo(JAIL_POS);
+		player.moveTo(40);
 		Square[] square = board.getBoard();
-		Jail jail = (Jail) square[JAIL_POS];
+		Jail jail = (Jail) square[40];
 		jailInteraction(player, jail);
 	}
 
 	private void intoJail(Player player) {
-		int VISIT_POS = 10;
 		player.toJail();
-		player.moveTo(VISIT_POS);
 	}
 
 	private int additionalFunds(int cost, Player player, Player owner) {
