@@ -50,4 +50,8 @@ public class InputDeck implements Deck {
 
 	public void returnOutOfJail() {
 	}
+
+	public Iterable<Card> cards() {
+		return new ArrayList<>(deck);
+	}
 }

@@ -4,8 +4,8 @@ public class Card {
 	private CardType type;
 	private CardAction action;
 	private int value;
-	private int travel;
-	private int travelTo;
+	private int travel = Integer.MAX_VALUE;
+	private int travelTo = Integer.MAX_VALUE;
 	private boolean nearestRail;
 	private boolean passGo;
 	private int house;

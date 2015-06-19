@@ -41,4 +41,8 @@ public class RandomDeck implements Deck {
 	public void returnOutOfJail() {
 		outOfJailFree = true;
 	}
+
+	public Iterable<Card> cards() {
+		return new ArrayList<>(deck);
+	}
 }

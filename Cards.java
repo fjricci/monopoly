@@ -5,6 +5,7 @@ public class Cards implements Square {
 	private Deck deck; //store deck of cards
 	private String name;
 	private int pos;
+	private Card.CardType type;
 
 	//construct square of type cards
 	public Cards(String name, int pos, Card.CardType type, Deck deck) {
@@ -18,6 +19,11 @@ public class Cards implements Square {
 
 		this.name = name;
 		this.pos = pos;
+		this.type = type;
+	}
+
+	public Card.CardType type() {
+		return type;
 	}
 
 	public boolean isOwnable() {
@@ -94,5 +100,9 @@ public class Cards implements Square {
 
 	public String toString() {
 		return name;
+	}
+
+	public Iterable<Card> cards() {
+		return deck.cards();
 	}
 }

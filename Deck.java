@@ -10,4 +10,6 @@ public interface Deck {
 	void initialize(Card[] cards);
 
 	void returnOutOfJail();
+
+	Iterable<Card> cards();
 }
