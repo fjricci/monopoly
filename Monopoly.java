@@ -218,7 +218,7 @@ public class Monopoly {
 			if (roll.is_double)
 				System.out.print(" (double)");
 			Square[] square = board.getBoard();
-			System.out.println(" and landed on " + square[player.position() + roll.val].name());
+			System.out.println(" and landed on " + square[(player.position() + roll.val) % 40].name());
 			player.move(roll.val);
 
 			handleSquare(player, square[player.position()], roll.val);
