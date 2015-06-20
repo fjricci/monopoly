@@ -67,7 +67,7 @@ public class Monopoly {
 			community = new RandomDeck();
 		}
 
-		board = new Board(chance, community); //create new board
+		board = new Board(chance, community, deterministic); //create new board
 		initialize();
 	}
 

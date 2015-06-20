@@ -21,12 +21,15 @@ public class Utility implements Square {
 	private Utility other;
 
 	//utility constructor
-	public Utility(String name, int pos) {
+	public Utility(String name, int pos, boolean deterministic) {
 		numOwned = 0;
 		mortgaged = false;
 		this.name = name;
 		this.pos = pos;
-		this.dice = new InputDice(new Input());
+		if (deterministic)
+			this.dice = new InputDice(new Input());
+		else
+			this.dice = new ProbDice();
 	}
 
 	public void setOther(Utility other) {

@@ -7,13 +7,13 @@ public class Board {
 	private Deck community;
 
 	//constructor for a new board of squares
-	public Board(Deck chance, Deck community) {
+	public Board(Deck chance, Deck community, boolean deterministic) {
 		board = new Square[N];
 		this.chance = chance;
 		this.community = community;
 		//initialize board squares
 		for (int i = 0; i < N; i++)
-			board[i] = makeSquare(i);
+			board[i] = makeSquare(i, deterministic);
 
 		makeGroups();
 		makeRail();
@@ -42,7 +42,7 @@ public class Board {
 		return board;
 	}
 
-	private Square makeSquare(int pos) {
+	private Square makeSquare(int pos, boolean deterministic) {
 		switch (pos) {
 			case 0:
 				return go("Go", pos);
@@ -69,7 +69,7 @@ public class Board {
 			case 11:
 				return charles("St. Charles Place", pos);
 			case 12:
-				return electric("Electric Company", pos);
+				return electric("Electric Company", pos, deterministic);
 			case 13:
 				return states("States Avenue", pos);
 			case 14:
@@ -101,7 +101,7 @@ public class Board {
 			case 27:
 				return ventor("Ventor Avenue", pos);
 			case 28:
-				return water("Water Works", pos);
+				return water("Water Works", pos, deterministic);
 			case 29:
 				return marvin("Marvin Gardens", pos);
 			case 30:
@@ -194,8 +194,8 @@ public class Board {
 		return new Jail(name, pos, Jail.JailType.TO_JAIL);
 	}
 
-	private Square water(String name, int pos) {
-		return new Utility(name, pos);
+	private Square water(String name, int pos, boolean deterministic) {
+		return new Utility(name, pos, deterministic);
 	}
 
 	private Square bAndO(String name, int pos) {
@@ -206,8 +206,8 @@ public class Board {
 		return new Railroad(name, pos);
 	}
 
-	private Square electric(String name, int pos) {
-		return new Utility(name, pos);
+	private Square electric(String name, int pos, boolean deterministic) {
+		return new Utility(name, pos, deterministic);
 	}
 
 	private Square visiting(String name, int pos) {

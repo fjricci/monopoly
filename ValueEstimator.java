@@ -30,7 +30,7 @@ public class ValueEstimator {
     public static void main(String[] args) {
 	    Deck chanceDeck = new RandomDeck();
 	    Deck commDeck = new RandomDeck();
-	    Board board = new Board(chanceDeck, commDeck);
+	    Board board = new Board(chanceDeck, commDeck, false);
 	    ProbDice probDice = new ProbDice();
         Queue<Player> queue = new LinkedList<>();
 	    Cards chance = (Cards) board.square(7);
