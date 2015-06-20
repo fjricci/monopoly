@@ -217,12 +217,11 @@ public class Monopoly {
 			System.out.print("You rolled a " + roll.val);
 			if (roll.is_double)
 				System.out.print(" (double)");
-			int pos = player.position();
 			Square[] square = board.getBoard();
-			System.out.println(" and landed on " + square[pos + roll.val].name());
+			System.out.println(" and landed on " + square[player.position() + roll.val].name());
 			player.move(roll.val);
 
-			handleSquare(player, square[pos], roll.val);
+			handleSquare(player, square[player.position()], roll.val);
 
 			if (!roll.is_double || player.inJail())
 				break;
