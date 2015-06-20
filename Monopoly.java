@@ -79,7 +79,8 @@ public class Monopoly {
 	public void run() {
 		while (players.size() > 1) {
 			try {
-				players.forEach(this::turn);
+				for (Player p : players)
+					turn(p);
 			} catch (NoSuchElementException e) {
 				System.out.println("Early Termination initiated.");
 				return;

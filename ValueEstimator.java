@@ -42,8 +42,8 @@ public class ValueEstimator {
 
         queue.add(player1);
         queue.add(player2);
-/*        queue.add(player3);
-        queue.add(player4);*/
+	    queue.add(player3);
+	    queue.add(player4);
 
 	    ValueEstimator value = new ValueEstimator(board, queue, probDice, chance);
 
