@@ -4,41 +4,34 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class ValueEstimator {
-	private Queue<Player.PlayerType> playerQueue; //contains all player enums
-	private Queue<Integer> posQueue;  //contains all player positions
-    private Board board;  //stores a board
-    private Player player;  //stores current player
+	private final int NUM_PLAYERS;
+	private final int DECK_SIZE = 16;
+	private Queue<Player> players;  //contains all player positions
+	private Board board;  //stores a board
     private ProbDice probDice;   //stores a pair of six-sided probDice
     private Cards chance; //stores a deck of chance cards
     private double[] doubleProb;
 	private double[] singleProb;
 
 	//constructs ValueEstimator object
-	public ValueEstimator(Board board, Queue<Player> queue,
-                          Player player, ProbDice probDice, Cards chance)
-    {
-        posQueue = new LinkedList<>();
-        playerQueue = new LinkedList<>();
-        
-        //iterate through queue of players, enqueue position and enum
-	    for (Player p : queue) {
-		    posQueue.add(p.position());
-            playerQueue.add(p.getPlayer());
-        }
+	public ValueEstimator(Board board, Queue<Player> queue, ProbDice probDice, Cards chance) {
+	    players = queue;
+
+		//iterate through queue of players, enqueue position and enum
         this.board = board;
-        this.player = player;
         this.probDice = probDice;
         this.chance = chance;
         if (probDice.numDice() == 2)
             setDouble();
-    }
+
+	    this.NUM_PLAYERS = players.size();
+	}
 
     public static void main(String[] args) {
 	    Deck chanceDeck = new RandomDeck();
 	    Deck commDeck = new RandomDeck();
 	    Board board = new Board(chanceDeck, commDeck);
 	    ProbDice probDice = new ProbDice();
-        Player player = new Player(Player.PlayerType.PLAYER_A, "Francis");
         Queue<Player> queue = new LinkedList<>();
 	    Cards chance = (Cards) board.square(7);
 
@@ -49,54 +42,57 @@ public class ValueEstimator {
 
         queue.add(player1);
         queue.add(player2);
-        queue.add(player3);
-        queue.add(player4);
+/*        queue.add(player3);
+        queue.add(player4);*/
 
-     /*   for (int i = 0; i < board.size(); i++) {
-            Square square = new Square(i);
-            if (square.ownable())
-                player.addProperty(i);
-        }*/
-/*
-        Queue<Square> properties = player.properties();
-        for (Square sq : properties) {
-            System.out.println(sq);
-            System.out.println();
-        }
-*/
-	    ValueEstimator value = new ValueEstimator(board, queue,
-                player, probDice, chance);
-/*
-        double[] probs = value.probLanding(board.square(0), queue);
+	    ValueEstimator value = new ValueEstimator(board, queue, probDice, chance);
+
+	    double[] probs = value.probLanding(0);
 
         for (double prob : probs)
-	        System.out.println(prob);*/
+	        System.out.println(prob);
+
 	    double totProb = 0;
-	    double[] tmp = {1.212, 0, 2.384, 5.556, 9.322, 12.153, 13.836, 6.250, 13.836, 11.111, 8.280, 6.597, 3.766, 0, 0, 2.083, 0, 0, 0, 0, 0, 0, 0, 0, 1.042, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.042, 1.531};
 	    for (int i = 0; i < 41; i++) {
-		    double prob = value.getProb(i, 0, board.square(i));
-		    System.out.println(i + ") " + prob * 100 + " | " + tmp[i]);
+		    double prob = value.getProb(i, 0);
+		    System.out.println(i + ") " + prob * 100);
 		    totProb += prob;
 	    }
 	    System.out.println("Tot prob: " + totProb);
     }
-    
-    //return the probability of a given number of players landing
+
+	public double expectedValue(int squarePos, int val, int playerPos) {
+		Player p;
+		while (true) {
+			p = players.remove();
+			if (p.position() == playerPos)
+				break;
+			players.add(p);
+		}
+
+		double[] probs = probLanding(squarePos);
+
+		players.add(p);
+
+		double tot = 0;
+		for (int i = 0; i < probs.length; i++)
+			tot += probs[i] * val * i;
+
+		return tot;
+	}
+
+	//return the probability of a given number of players landing
     //on a given property
-    public double[] probLanding(Square sq, Queue<Player> players)
+    public double[] probLanding(int squarePos)
     {
         //first array dimension is the square position
         //second array dimension is the number of players landing on square
-	    double[] probs = new double[players.size()];
-	    double[] totProbs = new double[players.size()];
+	    double[] probs = new double[NUM_PLAYERS + 1];
+	    double[] totProbs = new double[NUM_PLAYERS + 1];
 
-	    int pos = 0;
-	    for (Player p : players) {
-		    probs[pos++] = getProb(sq.position(), p.position(), sq);
-		    System.out.println(probs[pos - 1]);
-	    }
-
-	    System.out.println("************************");
+	    int num = 0;
+	    for (Player p : players)
+		    probs[num++] = getProb(squarePos, p.position());
 
 	    totProbs[0] = 1;
 	    for (double prob : probs)
@@ -111,7 +107,7 @@ public class ValueEstimator {
 		    totProbs[1] += prod;
 	    }
 
-	    if (players.size() == 1)
+	    if (NUM_PLAYERS == 1)
 		    return totProbs;
 
 	    for (int i = 0; i < probs.length; i++) {
@@ -125,7 +121,7 @@ public class ValueEstimator {
 		    }
 	    }
 
-	    if (players.size() == 2)
+	    if (NUM_PLAYERS == 2)
 		    return totProbs;
 
 	    //assume that p[4+] is negligible.
@@ -134,8 +130,10 @@ public class ValueEstimator {
     }
     
     //probability of getting from playerPos to squarePos
-    private double getProb(int squarePos, int playerPos, Square square)
+    private double getProb(int squarePos, int playerPos)
     {
+	    Square square = board.square(squarePos);
+
         if (squarePos < playerPos)
 	        squarePos += board.size(); //accounts for passing go
 	    int dist = squarePos - playerPos;
@@ -161,8 +159,8 @@ public class ValueEstimator {
     //probability of landing directly on property by probDice roll
     private double directProb(int dist)
     {
-	    //return doubleProb(dist);
-	    return singleProb(dist);
+	    return doubleProb(dist);
+	    //return singleProb(dist);
     }
     
     //probability of landing on property by chance card
@@ -172,8 +170,6 @@ public class ValueEstimator {
     }
 
 	private double communityProb(int squarePos, int playerPos, Square square) {
-
-		//TODO jail
 		double prob = 0.0;
 		int comPosA = 2;
 		int comPosB = 17;
@@ -198,7 +194,7 @@ public class ValueEstimator {
 
 		double probChance = probChanceA + probChanceB + probChanceC;
 
-		return probChance / chance.size();
+		return probChance / DECK_SIZE;
 	}
 
 	private double chanceProb(int squarePos, int playerPos, Square square) {
@@ -224,7 +220,7 @@ public class ValueEstimator {
 
 		double probChance = probChanceA + probChanceB + probChanceC;
 
-		int SIZE = chance.size();
+		int SIZE = DECK_SIZE;
 
 		for (Card card : chance.cards()) {
 			if (card.travelTo() == squarePos)
@@ -238,8 +234,6 @@ public class ValueEstimator {
 			prob += moveNearest(card, square, probChanceA, probChanceB, probChanceC) / SIZE;
 		}
 
-		if (prob != 0)
-			System.out.println("Chance prob: " + prob);
 		return prob;
 	}
 

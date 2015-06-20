@@ -49,6 +49,7 @@ public class Monopoly {
 	private Deck community;
 	private Input input;
 	private Queue<Player> players;
+	private ValueEstimator valueEstimator;
 
 	public Monopoly() {
 		players = new LinkedList<>();
@@ -121,6 +122,8 @@ public class Monopoly {
 			Player player = new Player(type, name);
 			players.add(player);
 		}
+
+		valueEstimator = new ValueEstimator(board, players, new ProbDice(), (Cards) board.square(7));
 
 		if (deterministic)
 			return;
@@ -198,6 +201,7 @@ public class Monopoly {
 					player.leaveJail();
 					roll.is_double = false; //we don't re-roll if the double was used to escape jail
 				} else {
+					System.out.println("You did not roll a double.");
 					if (!player.stayJail())
 						leaveJail(player);
 					else
@@ -210,13 +214,13 @@ public class Monopoly {
 				break;
 			}
 
-			player.move(roll.val);
 			System.out.print("You rolled a " + roll.val);
 			if (roll.is_double)
 				System.out.print(" (double)");
 			int pos = player.position();
 			Square[] square = board.getBoard();
-			System.out.println(" and landed on " + square[pos].name());
+			System.out.println(" and landed on " + square[pos + roll.val].name());
+			player.move(roll.val);
 
 			handleSquare(player, square[pos], roll.val);
 
@@ -272,6 +276,18 @@ public class Monopoly {
 	}
 
 	private void buyHouses(Player player) {
+		System.out.println("Expected Values:");
+		for (Square sq : player.properties()) {
+			Property prop;
+			if (sq instanceof Property)
+				prop = (Property) sq;
+			else
+				continue;
+
+			double val = valueEstimator.expectedValue(sq.position(), prop.rentDiff(), player.position());
+
+			System.out.println(prop.name() + ": " + val);
+		}
 		do {
 			System.out.println("On which property would you like to purchase a house?");
 			Property prop = propertySelect(player, false);
@@ -390,7 +406,7 @@ public class Monopoly {
 		while (input.inputBool()) {
 			Square sq = squareSelect(player);
 			sq.purchase(other);
-			player.properties().remove(sq);
+			player.sellProp(sq);
 			other.addProperty(sq);
 			System.out.println("Any more properties to give?");
 		}
@@ -399,7 +415,7 @@ public class Monopoly {
 		while (input.inputBool()) {
 			Square sq = squareSelect(other);
 			sq.purchase(player);
-			other.properties().remove(sq);
+			other.sellProp(sq);
 			player.addProperty(sq);
 			System.out.println("Any more properties to give?");
 		}

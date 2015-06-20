@@ -108,6 +108,10 @@ public class Player {
 		return true;
 	}
 
+	public void sellProp(Square sq) {
+		properties.remove(sq);
+	}
+
 	public void leaveJail() {
 		inJail = false;
 		moveTo(10);

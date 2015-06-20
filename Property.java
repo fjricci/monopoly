@@ -159,6 +159,25 @@ public class Property implements Square {
 		}
 	}
 
+	public int rentDiff() {
+		if (!owned || !monopoly || (buildings == 5))
+			return 0;
+		switch (buildings) {
+			case 0:
+				return oneH - 2 * rent;
+			case 1:
+				return twoH - oneH;
+			case 2:
+				return threeH - twoH;
+			case 3:
+				return fourH - threeH;
+			case 4:
+				return hotel - fourH;
+			default:
+				return 0;
+		}
+	}
+
 	public PlayerType ownerType() {
 		return ownerType;
 	}
