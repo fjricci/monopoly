@@ -50,6 +50,7 @@ public class Monopoly {
 	private Input input;
 	private Queue<Player> players;
 	private ValueEstimator valueEstimator;
+	private boolean lost = false;
 
 	public Monopoly() {
 		players = new LinkedList<>();
@@ -79,8 +80,10 @@ public class Monopoly {
 	public void run() {
 		while (players.size() > 1) {
 			try {
-				for (Player p : players)
-					turn(p);
+				Player p = players.remove();
+				turn(p);
+				if (!lost)
+					players.add(p);
 			} catch (NoSuchElementException e) {
 				System.out.println("Early Termination initiated.");
 				return;
@@ -850,7 +853,7 @@ public class Monopoly {
 		while (loser.numJailFree() > 0)
 			winner.addJailFree(loser.useJailFree());
 
-		players.remove(loser);
+		lost = true;
 	}
 
 	private void printState() {
