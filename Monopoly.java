@@ -84,6 +84,7 @@ public class Monopoly {
 				turn(p);
 				if (!lost)
 					players.add(p);
+				lost = false;
 			} catch (NoSuchElementException e) {
 				System.out.println("Early Termination initiated.");
 				return;
@@ -232,7 +233,7 @@ public class Monopoly {
 		}
 
 		boolean additional = true;
-		while (additional) {
+		while (additional && !lost) {
 			System.out.println("Would you like to take any additional actions on this turn?");
 			System.out.println("Please select choice");
 			System.out.println("1) Buy/sell houses");
@@ -751,7 +752,7 @@ public class Monopoly {
 
 	private int additionalFunds(int cost, Player player, Player owner) {
 		Queue<Square> props = availableAssets(player);
-		int availableAssets = totalVal(props) + player.getMoney();
+		int availableAssets = mortVal(props) + player.getMoney();
 
 		if (cost <= player.getMoney()) {
 			player.excMoney(-1 * cost);
@@ -843,17 +844,28 @@ public class Monopoly {
 		return totalMoney;
 	}
 
+	private int mortVal(Queue<Square> props) {
+		int totalMoney = 0;
+		for (Square sq : props) {
+			totalMoney += sq.mortgageCost();
+			if (sq instanceof Property) {
+				Property prop = (Property) sq;
+				totalMoney += prop.numHouses() * prop.houseCost() / 2;
+			}
+		}
+		return totalMoney;
+	}
+
 	private void lose(Player loser, Player winner) {
 		Queue<Square> squares = loser.properties();
-		while (!squares.isEmpty()) {
+		while (!squares.isEmpty())
 			winner.addProperty(squares.remove());
-			squares.remove();
-		}
 		winner.excMoney(loser.getMoney());
 		while (loser.numJailFree() > 0)
 			winner.addJailFree(loser.useJailFree());
 
 		lost = true;
+		System.out.println(loser.name() + " has LOST!");
 	}
 
 	private void printState() {

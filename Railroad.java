@@ -110,6 +110,8 @@ public class Railroad implements Square {
 	}
 
 	public String toString() {
+		if (mortgaged)
+			return name + " Mortgaged";
 		return name;
 	}
 }
