@@ -61,18 +61,9 @@ public class ValueEstimator {
 	    System.out.println("Tot prob: " + totProb);
     }
 
-	public double expectedValue(int squarePos, int val, int playerPos) {
+	public double expectedValue(int squarePos, int val) {
 		Player p;
-		while (true) {
-			p = players.remove();
-			if (p.position() == playerPos)
-				break;
-			players.add(p);
-		}
-
 		double[] probs = probLanding(squarePos);
-
-		players.add(p);
 
 		double tot = 0;
 		for (int i = 0; i < probs.length; i++)

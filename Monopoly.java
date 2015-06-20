@@ -287,7 +287,7 @@ public class Monopoly {
 			else
 				continue;
 
-			double val = valueEstimator.expectedValue(sq.position(), prop.rentDiff(), player.position());
+			double val = valueEstimator.expectedValue(sq.position(), prop.rentDiff());
 
 			System.out.println(prop.name() + ": " + val);
 		}
@@ -728,7 +728,7 @@ public class Monopoly {
 
 	private void allPlayers(int value, Player player) {
 		player.excMoney(-1 * (players.size() - 1) * value);
-		players.stream().filter(p -> !p.equals(player)).forEach(p -> p.excMoney(value));
+		players.stream().forEach(p -> p.excMoney(value));
 	}
 
 	private void jailInteraction(Player player, Jail jail) {

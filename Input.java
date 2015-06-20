@@ -39,7 +39,7 @@ public class Input {
 		while (true) {
 			String input = inputString();
 			for (int i = 0; i < choices.length; i++) {
-				if (input.equalsIgnoreCase(choices[i]))
+				if (input.equalsIgnoreCase(choices[i]) || input.equalsIgnoreCase(choices[i].substring(0, 1)))
 					return i;
 			}
 			System.out.println("Please enter a valid decision.");
