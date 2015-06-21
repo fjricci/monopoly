@@ -1,7 +1,5 @@
 package monopoly;
 
-import monopoly.Player.PlayerType;
-
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.stream.Collectors;
@@ -23,7 +21,6 @@ public class Property implements Square {
 	private boolean monopoly; //does one player own all properties in set?
 	private boolean owned;  //is property owned?
 	private boolean mortgaged; //is property mortgaged
-	private PlayerType ownerType;
 	private Player owner;
 	private Property groupA;
 	private Property groupB;
@@ -68,7 +65,6 @@ public class Property implements Square {
 	public void purchase(Player player) {
 		owned = true;
 		owner = player;
-		ownerType = player.getPlayer();
 
 		updateMonopoly(player);
 	}
@@ -178,10 +174,6 @@ public class Property implements Square {
 		}
 	}
 
-	public PlayerType ownerType() {
-		return ownerType;
-	}
-
 	public Player owner() {
 		return owner;
 	}
@@ -205,11 +197,11 @@ public class Property implements Square {
 		return value / 2;
 	}
 
-	public void setMonopoly() {
+	private void setMonopoly() {
 		monopoly = true;
 	}
 
-	public void breakMonopoly() {
+	private void breakMonopoly() {
 		monopoly = false;
 	}
 

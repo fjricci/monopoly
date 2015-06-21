@@ -5,8 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class RandomDeck implements Deck {
+	private final ArrayList<Card> deck; //store array of cards
 	private int SIZE; //store number of cards
-	private ArrayList<Card> deck; //store array of cards
 	private int current;  //store current card
 	private boolean outOfJailFree;
 

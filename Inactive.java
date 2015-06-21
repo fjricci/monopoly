@@ -1,8 +1,8 @@
 package monopoly;
 
 public class Inactive implements Square {
-	private int pos;
-	private String name;
+	private final int pos;
+	private final String name;
 
 	public Inactive(String name, int pos) {
 		this.name = name;

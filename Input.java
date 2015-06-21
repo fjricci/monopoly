@@ -7,8 +7,8 @@ import java.util.Scanner;
  * Created by fjricci on 4/7/2015.
  * Gather player inputs
  */
-public class Input {
-	private Scanner scanner;
+class Input {
+	private final Scanner scanner;
 
 	public Input() {
 		scanner = new Scanner(System.in);

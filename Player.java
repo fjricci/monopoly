@@ -5,14 +5,13 @@ import java.util.Queue;
 import java.util.stream.Collectors;
 
 public class Player {
-	private final int BOARD_SIZE = 40;
 	private final int TO_JAIL = 30;
 	private final int IN_JAIL = 10;
+	private final Queue<Square> properties;
+	private final PlayerType player;
+	private final String playerName;
 	private int money;
-	private Queue<Square> properties;
 	private int position;
-	private PlayerType player;
-	private String playerName;
 	private boolean inJail;
 	private int jailTurn;
 	private int numJailFree;
@@ -38,6 +37,7 @@ public class Player {
 
 	public void move(int numSpaces) {
 		position += numSpaces;
+		int BOARD_SIZE = 40;
 		if (position >= BOARD_SIZE) {
 			position -= BOARD_SIZE;
 			excMoney(200);
@@ -64,10 +64,6 @@ public class Player {
 		return position;
 	}
 
-	public int numProps() {
-		return properties.size();
-	}
-
 	public Queue<Square> properties() {
 		return properties.stream().collect(Collectors.toCollection(LinkedList::new));
 	}
@@ -78,11 +74,6 @@ public class Player {
 
 	public PlayerType getPlayer() {
 		return player;
-	}
-
-	public Queue<Integer> propIDs() {
-		return properties.stream().map(Square::position).collect(
-				Collectors.toCollection(LinkedList::new));
 	}
 
 	public int getMoney() {

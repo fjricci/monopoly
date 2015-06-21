@@ -5,7 +5,7 @@ import java.util.Random;
 public class ProbDice implements Dice {
 	private final int N; //number of dice
 	private final int SIDES; //number of sides per die
-	private Random rand;
+	private final Random rand;
 
 	//single six-sided die
 	public ProbDice() {

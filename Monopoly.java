@@ -40,19 +40,19 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
-public class Monopoly {
+class Monopoly {
 	private final boolean deterministic;
+	private final Dice dice; //two six-sided dice
+	private final Board board; //game board
+	private final Deck chance;
+	private final Deck community;
+	private final Input input;
+	private final Queue<Player> players;
 	private boolean chanceBoost = false;
-	private Dice dice; //two six-sided dice
-	private Board board; //game board
-	private Deck chance;
-	private Deck community;
-	private Input input;
-	private Queue<Player> players;
 	private ValueEstimator valueEstimator;
 	private boolean lost = false;
 
-	public Monopoly() {
+	private Monopoly() {
 		players = new LinkedList<>();
 		input = new Input();
 
@@ -77,7 +77,7 @@ public class Monopoly {
 		monopoly.run();
 	}
 
-	public void run() {
+	private void run() {
 		while (players.size() > 1) {
 			try {
 				Player p = players.remove();
@@ -294,7 +294,7 @@ public class Monopoly {
 		}
 		do {
 			System.out.println("On which property would you like to purchase a house?");
-			Property prop = propertySelect(player, false);
+			Property prop = propertySelect(player);
 			if (prop.numHouses() == 5 || !prop.monopoly()) {
 				System.out.println("You cannot buy houses on " + prop.name());
 				System.out.println("Would you like to buy any more houses?");
@@ -325,7 +325,7 @@ public class Monopoly {
 		int value = 0;
 		do {
 			System.out.println("On which property would you like to sell a house?");
-			Property prop = propertySelect(player, false);
+			Property prop = propertySelect(player);
 			if (prop.numHouses() == 0) {
 				System.out.println("You cannot sell houses on " + prop.name());
 				System.out.println("Would you like to sell any more houses?");
@@ -448,7 +448,7 @@ public class Monopoly {
 		}
 	}
 
-	public void unowned(Player player, Square square) {
+	private void unowned(Player player, Square square) {
 		int cost = square.cost();
 
 		if (totalVal(availableAssets(player)) + player.getMoney() < cost) {
@@ -782,13 +782,13 @@ public class Monopoly {
 		return cost;
 	}
 
-	private Property propertySelect(Player player, boolean mort) {
+	private Property propertySelect(Player player) {
 		Queue<Square> props = new LinkedList<>();
 		for (Square sq : player.properties()) {
 			if (!(sq instanceof Property))
 				continue;
 
-			if (sq.isMortgaged() == mort)
+			if (!sq.isMortgaged())
 				props.add(sq);
 		}
 		return (Property) propertySelect(props);

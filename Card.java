@@ -7,7 +7,6 @@ public class Card {
 	private int travel = Integer.MAX_VALUE;
 	private int travelTo = Integer.MAX_VALUE;
 	private boolean nearestRail;
-	private boolean passGo;
 	private int house;
 	private int hotel;
 	private int eachPlayer;
@@ -153,7 +152,6 @@ public class Card {
 		textA = "Advance to Go";
 		textB = "Collect $200";
 		travelTo = 0;
-		passGo = true;
 	}
 
 	private void xmas() {
@@ -252,7 +250,6 @@ public class Card {
 		action = CardAction.MOVE;
 		textA = "Go back 3 spaces";
 		travel = -3;
-		passGo = false;
 		increased = false;
 	}
 
@@ -264,7 +261,6 @@ public class Card {
 				+ "10 times the amount thrown";
 		nearestRail = false;
 		increased = true;
-		passGo = false;
 	}
 
 	private void chairman() {
@@ -279,7 +275,6 @@ public class Card {
 		action = CardAction.MOVE_TO;
 		textA = "Advance to St. Charles Place";
 		travelTo = 11;
-		passGo = true;
 		increased = false;
 	}
 
@@ -287,7 +282,6 @@ public class Card {
 		action = CardAction.MOVE_TO;
 		textA = "Take a walk on the Boardwalk";
 		travelTo = 39;
-		passGo = false;
 		increased = false;
 	}
 
@@ -304,7 +298,6 @@ public class Card {
 		textC = "If railroad is unowned, you may buy it from the bank.";
 		nearestRail = true;
 		increased = true;
-		passGo = false;
 	}
 
 	private void repairs() {
@@ -327,7 +320,6 @@ public class Card {
 		action = CardAction.MOVE_TO;
 		textA = "Advance to Illinois Avenue";
 		travelTo = 24;
-		passGo = false;
 		increased = false;
 	}
 
@@ -343,7 +335,6 @@ public class Card {
 		textB = "Railroad";
 		textC = "If you pass go collect $200";
 		travelTo = 5;
-		passGo = true;
 		increased = false;
 	}
 
@@ -361,10 +352,6 @@ public class Card {
 
 	public boolean travelRail() {
 		return nearestRail;
-	}
-
-	public boolean passGo() {
-		return passGo;
 	}
 
 	public int house() {

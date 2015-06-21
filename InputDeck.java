@@ -9,9 +9,9 @@ import java.util.Collections;
  * Manual card input
  */
 public class InputDeck implements Deck {
+	private final ArrayList<Card> deck; //store array of cards
+	private final Input input;  //store current card
 	private int SIZE; //store number of cards
-	private ArrayList<Card> deck; //store array of cards
-	private Input input;  //store current card
 
 	//create shuffled deck of cards
 	public InputDeck() {

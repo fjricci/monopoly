@@ -3,15 +3,13 @@ package monopoly;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class ValueEstimator {
+class ValueEstimator {
 	private final int NUM_PLAYERS;
 	private final int DECK_SIZE = 16;
-	private Queue<Player> players;  //contains all player positions
-	private Board board;  //stores a board
-    private ProbDice probDice;   //stores a pair of six-sided probDice
-    private Cards chance; //stores a deck of chance cards
-    private double[] doubleProb;
-	private double[] singleProb;
+	private final Queue<Player> players;  //contains all player positions
+	private final Board board;  //stores a board
+	private final Cards chance; //stores a deck of chance cards
+	private double[] doubleProb;
 
 	//constructs ValueEstimator object
 	public ValueEstimator(Board board, Queue<Player> queue, ProbDice probDice, Cards chance) {
@@ -19,9 +17,8 @@ public class ValueEstimator {
 
 		//iterate through queue of players, enqueue position and enum
         this.board = board;
-        this.probDice = probDice;
-        this.chance = chance;
-        if (probDice.numDice() == 2)
+		this.chance = chance;
+		if (probDice.numDice() == 2)
             setDouble();
 
 	    this.NUM_PLAYERS = players.size();
@@ -62,7 +59,6 @@ public class ValueEstimator {
     }
 
 	public double expectedValue(int squarePos, int val) {
-		Player p;
 		double[] probs = probLanding(squarePos);
 
 		double tot = 0;
@@ -74,8 +70,7 @@ public class ValueEstimator {
 
 	//return the probability of a given number of players landing
     //on a given property
-    public double[] probLanding(int squarePos)
-    {
+	private double[] probLanding(int squarePos) {
         //first array dimension is the square position
         //second array dimension is the number of players landing on square
 	    double[] probs = new double[NUM_PLAYERS + 1];
@@ -157,11 +152,10 @@ public class ValueEstimator {
     //probability of landing on property by chance card
     private double indirectProb(int squarePos, int playerPos, Square square)
     {
-	    return chanceProb(squarePos, playerPos, square) + communityProb(squarePos, playerPos, square);
+	    return chanceProb(squarePos, playerPos, square) + communityProb(squarePos, playerPos);
     }
 
-	private double communityProb(int squarePos, int playerPos, Square square) {
-		double prob = 0.0;
+	private double communityProb(int squarePos, int playerPos) {
 		int comPosA = 2;
 		int comPosB = 17;
 		int comPosC = 33;
@@ -276,7 +270,7 @@ public class ValueEstimator {
         int[] tripleWays = new int[MAX];
 
         doubleProb = new double[MAX];
-	    singleProb = new double[13];
+	    //    double[] singleProb = new double[13];
 
         ways[2] = 1;
         ways[3] = 2;
@@ -346,56 +340,22 @@ public class ValueEstimator {
         for (int i = 0; i < MAX; i++)
 	        doubleProb[i] = (ways[i] + doubleWays[i] / D + tripleWays[i] / T) / MAX;
 
-	    for (int i = 0; i < 13; i++)
-		    singleProb[i] = ways[i] / 36.0;
+	    //  for (int i = 0; i < 13; i++)
+	    //    singleProb[i] = ways[i] / 36.0;
     }
 
-	public double singleProb(int roll) {
-		if (roll < 2 || roll > 12)
-			return 0.0;
-		return singleProb[roll];
-	}
+// --Commented out by Inspection START (6/21/2015 9:22 AM):
+//	public double singleProb(int roll) {
+//		if (roll < 2 || roll > 12)
+//			return 0.0;
+//		return singleProb[roll];
+//	}
+// --Commented out by Inspection STOP (6/21/2015 9:22 AM)
 
-    public double doubleProb(int roll) {
-        if (roll < 2 || roll > 35)
+	private double doubleProb(int roll) {
+		if (roll < 2 || roll > 35)
             return 0.0;
         return doubleProb[roll];
     }
 
-    public double jailProb() {
-        return doubleProb[0];
-    }
-
-    //return probability of getting a given total
-    public double prob(int total) {
-        int N = probDice.numDice();
-        int SIDES = probDice.sides();
-        if (total < N || total > N * SIDES)
-            return 0.0;
-        return numWays(total) / Math.pow(SIDES, N);
-    }
-
-    //return number of ways to get a given total
-    private double numWays(int total) {
-        int N = probDice.numDice();
-        int SIDES = probDice.sides();
-        int numWays = 0;
-
-        int k = 0;
-	    while (true) {
-		    int j = 0;
-		    while (true) {
-			    if (SIDES * k + j == total - N)
-				    numWays += Prob.combi(N, k) * Prob.combi(-N, j) * Math.pow(-1, k + j);
-			    if (j > total - N)
-                    break;
-                j++;
-            }
-            if (6 * k > total - N)
-                break;
-            k++;
-        }
-
-        return numWays;
-    }
 }

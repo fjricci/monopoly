@@ -7,7 +7,7 @@ package monopoly;
 public class InputDice implements Dice {
 	private final int N;
 	private final int SIDES;
-	private Input input;
+	private final Input input;
 
 	public InputDice(Input input) {
 		N = 2;

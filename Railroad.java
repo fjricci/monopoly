@@ -1,21 +1,14 @@
 package monopoly;
 
 public class Railroad implements Square {
-	//rent, given number of railroads owned by a player
-	private final int ONE = 25;
-	private final int TWO = 50;
-	private final int THREE = 100;
-	private final int FOUR = 200;
 	private final int COST = 200;
+	private final String name;
+	private final int pos;
+	private final Railroad[] others = new Railroad[3];
 	private int numOwned;  //number of railroads owned by a player
 	private Player owner;
 	private boolean owned;  //is property owned?
 	private boolean mortgaged;
-
-	private String name;
-	private int pos;
-
-	private Railroad[] others = new Railroad[3];
 
 	//constructor
 	public Railroad(String name, int pos) {
@@ -30,7 +23,7 @@ public class Railroad implements Square {
 		others[2] = c;
 	}
 
-	public void updateOwners(){
+	private void updateOwners() {
 		numOwned = 1;
 		for (Railroad r : others){
 			if (r.isOwned() && r.owner().equals(owner))
@@ -64,13 +57,13 @@ public class Railroad implements Square {
 
 		switch (numOwned) {
 			case 1:
-				return ONE;
+				return 25;
 			case 2:
-				return TWO;
+				return 50;
 			case 3:
-				return THREE;
+				return 100;
 			case 4:
-				return FOUR;
+				return 200;
 			default:
 				return 0;
 		}

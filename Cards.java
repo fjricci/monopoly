@@ -2,7 +2,7 @@ package monopoly;
 
 public class Cards implements Square {
 	private final int DECK_SIZE = 16; //16 cards in either type of deck
-	private Deck deck; //store deck of cards
+	private final Deck deck; //store deck of cards
 	private String name;
 	private int pos;
 	private Card.CardType type;
@@ -77,10 +77,6 @@ public class Cards implements Square {
 	//draw next card
 	public Card draw() {
 		return deck.drawCard();
-	}
-
-	public int size() {
-		return DECK_SIZE;
 	}
 
 	public int cost() {

@@ -3,8 +3,8 @@ package monopoly;
 public class Jail implements Square {
 
 	private final int pos;
-	private JailType type;
-	private String name;
+	private final JailType type;
+	private final String name;
 
 	public Jail(String name, int pos, JailType type) {
 		this.type = type;

@@ -1,10 +1,10 @@
 package monopoly;
 
-public class Board {
+class Board {
 	private final int N = 41;
-	private Square[] board; //representation of board
-	private Deck chance;
-	private Deck community;
+	private final Square[] board; //representation of board
+	private final Deck chance;
+	private final Deck community;
 
 	//constructor for a new board of squares
 	public Board(Deck chance, Deck community, boolean deterministic) {
@@ -45,87 +45,87 @@ public class Board {
 	private Square makeSquare(int pos, boolean deterministic) {
 		switch (pos) {
 			case 0:
-				return go("Go", pos);
+				return go(pos);
 			case 1:
-				return mediterranean("Mediterranean Avenue", pos);
+				return mediterranean(pos);
 			case 2:
-				return community("Community Chest", pos);
+				return community(pos);
 			case 3:
-				return baltic("Baltic Avenue", pos);
+				return baltic(pos);
 			case 4:
-				return income("Income Tax", pos);
+				return income(pos);
 			case 5:
-				return reading("Reading Railroad", pos);
+				return reading(pos);
 			case 6:
-				return oriental("Oriental Avenue", pos);
+				return oriental(pos);
 			case 7:
-				return chance("Chance", pos);
+				return chance(pos);
 			case 8:
-				return vermont("Vermont Avenue", pos);
+				return vermont(pos);
 			case 9:
-				return connecticut("Connecticut Avenue", pos);
+				return connecticut(pos);
 			case 10:
-				return visiting("Just Visiting", pos);
+				return visiting(pos);
 			case 11:
-				return charles("St. Charles Place", pos);
+				return charles(pos);
 			case 12:
-				return electric("Electric Company", pos, deterministic);
+				return electric(pos, deterministic);
 			case 13:
-				return states("States Avenue", pos);
+				return states(pos);
 			case 14:
-				return virginia("Virginia Avenue", pos);
+				return virginia(pos);
 			case 15:
-				return pennsylvaniaRR("Pennsylvania Railroad", pos);
+				return pennsylvaniaRR(pos);
 			case 16:
-				return james("St. James Place", pos);
+				return james(pos);
 			case 17:
-				return community("Community Chest", pos);
+				return community(pos);
 			case 18:
-				return tennessee("Tennessee Avenue", pos);
+				return tennessee(pos);
 			case 19:
-				return newYork("New York Avenue", pos);
+				return newYork(pos);
 			case 20:
-				return parking("Free Parking", pos);
+				return parking(pos);
 			case 21:
-				return kentucky("Kentucky Avenue", pos);
+				return kentucky(pos);
 			case 22:
-				return chance("Chance", pos);
+				return chance(pos);
 			case 23:
-				return indiana("Indiana Avenue", pos);
+				return indiana(pos);
 			case 24:
-				return illinois("Illinois Avenue", pos);
+				return illinois(pos);
 			case 25:
-				return bAndO("B & O Railroad", pos);
+				return bAndO(pos);
 			case 26:
-				return atlantic("Atlantic Avenue", pos);
+				return atlantic(pos);
 			case 27:
-				return ventor("Ventor Avenue", pos);
+				return ventor(pos);
 			case 28:
-				return water("Water Works", pos, deterministic);
+				return water(pos, deterministic);
 			case 29:
-				return marvin("Marvin Gardens", pos);
+				return marvin(pos);
 			case 30:
-				return toJail("Go to Jail", pos);
+				return toJail(pos);
 			case 31:
-				return pacific("Pacific Avenue", pos);
+				return pacific(pos);
 			case 32:
-				return carolina("North Carolina Avenue", pos);
+				return carolina(pos);
 			case 33:
-				return community("Community Chest", pos);
+				return community(pos);
 			case 34:
-				return pennsylvaniaAve("Pennsylvania Avenue", pos);
+				return pennsylvaniaAve(pos);
 			case 35:
-				return shortLine("Short Line", pos);
+				return shortLine(pos);
 			case 36:
-				return chance("Chance", pos);
+				return chance(pos);
 			case 37:
-				return park("Park Place", pos);
+				return park(pos);
 			case 38:
-				return luxury("Luxury Tax", pos);
+				return luxury(pos);
 			case 39:
-				return boardwalk("Boardwalk", pos);
+				return boardwalk(pos);
 			case 40:
-				return jail("In Jail", pos);
+				return jail(pos);
 			default:
 				return null;
 		}
@@ -182,63 +182,63 @@ public class Board {
 			propC.setGroup(propA, propB);
 	}
 
-	private Square luxury(String name, int pos) {
-		return new Taxes(name, pos, 75);
+	private Square luxury(int pos) {
+		return new Taxes(pos, false);
 	}
 
-	private Square shortLine(String name, int pos) {
-		return new Railroad(name, pos);
+	private Square shortLine(int pos) {
+		return new Railroad("Short Line", pos);
 	}
 
-	private Square toJail(String name, int pos) {
-		return new Jail(name, pos, Jail.JailType.TO_JAIL);
+	private Square toJail(int pos) {
+		return new Jail("Go to Jail", pos, Jail.JailType.TO_JAIL);
 	}
 
-	private Square water(String name, int pos, boolean deterministic) {
-		return new Utility(name, pos, deterministic);
+	private Square water(int pos, boolean deterministic) {
+		return new Utility("Water Works", pos, deterministic);
 	}
 
-	private Square bAndO(String name, int pos) {
-		return new Railroad(name, pos);
+	private Square bAndO(int pos) {
+		return new Railroad("B & O Railroad", pos);
 	}
 
-	private Square pennsylvaniaRR(String name, int pos) {
-		return new Railroad(name, pos);
+	private Square pennsylvaniaRR(int pos) {
+		return new Railroad("Pennsylvania Railroad", pos);
 	}
 
-	private Square electric(String name, int pos, boolean deterministic) {
-		return new Utility(name, pos, deterministic);
+	private Square electric(int pos, boolean deterministic) {
+		return new Utility("Electric Company", pos, deterministic);
 	}
 
-	private Square visiting(String name, int pos) {
-		return new Jail(name, pos, Jail.JailType.VISITING);
+	private Square visiting(int pos) {
+		return new Jail("Just Visiting", pos, Jail.JailType.VISITING);
 	}
 
-	private Square jail(String name, int pos) {
-		return new Jail(name, pos, Jail.JailType.IN_JAIL);
+	private Square jail(int pos) {
+		return new Jail("In Jail", pos, Jail.JailType.IN_JAIL);
 	}
 
-	private Square chance(String name, int pos) {
-		return new Cards(name, pos, Card.CardType.CHANCE, chance);
+	private Square chance(int pos) {
+		return new Cards("Chance", pos, Card.CardType.CHANCE, chance);
 	}
 
-	private Square reading(String name, int pos) {
-		return new Railroad(name, pos);
+	private Square reading(int pos) {
+		return new Railroad("Reading Railroad", pos);
 	}
 
-	private Square income(String name, int pos) {
-		return new Taxes(name, pos, 200, 10);
+	private Square income(int pos) {
+		return new Taxes(pos, true);
 	}
 
-	private Square community(String name, int pos) {
-		return new Cards(name, pos, Card.CardType.COMMUNITY, community);
+	private Square community(int pos) {
+		return new Cards("Community Chest", pos, Card.CardType.COMMUNITY, community);
 	}
 
-	private Square go(String name, int pos) {
-		return new Inactive(name, pos);
+	private Square go(int pos) {
+		return new Inactive("Go", pos);
 	}
 
-	private Square mediterranean(String name, int pos) {
+	private Square mediterranean(int pos) {
 		int rent = 2;
 		int oneH = 10;
 		int twoH = 30;
@@ -247,10 +247,10 @@ public class Board {
 		int hotel = 250;
 		int cost = 60;
 		int houses = 50;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("Mediterranean Avenue", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square baltic(String name, int pos) {
+	private Square baltic(int pos) {
 		int rent = 4;
 		int oneH = 20;
 		int twoH = 60;
@@ -259,10 +259,10 @@ public class Board {
 		int hotel = 450;
 		int cost = 60;
 		int houses = 50;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("Baltic Avenue", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square oriental(String name, int pos) {
+	private Square oriental(int pos) {
 		int rent = 6;
 		int oneH = 30;
 		int twoH = 90;
@@ -271,10 +271,10 @@ public class Board {
 		int hotel = 550;
 		int cost = 100;
 		int houses = 50;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("Oriental Avenue", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square vermont(String name, int pos) {
+	private Square vermont(int pos) {
 		int rent = 6;
 		int oneH = 30;
 		int twoH = 90;
@@ -283,10 +283,10 @@ public class Board {
 		int hotel = 550;
 		int cost = 100;
 		int houses = 50;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("Vermont Avenue", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square connecticut(String name, int pos) {
+	private Square connecticut(int pos) {
 		int rent = 8;
 		int oneH = 40;
 		int twoH = 100;
@@ -295,10 +295,10 @@ public class Board {
 		int hotel = 600;
 		int cost = 120;
 		int houses = 50;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("Connecticut Avenue", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square charles(String name, int pos) {
+	private Square charles(int pos) {
 		int rent = 10;
 		int oneH = 50;
 		int twoH = 150;
@@ -307,10 +307,10 @@ public class Board {
 		int hotel = 750;
 		int cost = 140;
 		int houses = 100;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("St. Charles Place", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square states(String name, int pos) {
+	private Square states(int pos) {
 		int rent = 10;
 		int oneH = 50;
 		int twoH = 150;
@@ -319,10 +319,10 @@ public class Board {
 		int hotel = 750;
 		int cost = 140;
 		int houses = 100;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("States Avenue", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square virginia(String name, int pos) {
+	private Square virginia(int pos) {
 		int rent = 12;
 		int oneH = 60;
 		int twoH = 180;
@@ -331,10 +331,10 @@ public class Board {
 		int hotel = 900;
 		int cost = 160;
 		int houses = 100;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("Virginia Avenue", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square james(String name, int pos) {
+	private Square james(int pos) {
 		int rent = 14;
 		int oneH = 70;
 		int twoH = 200;
@@ -343,10 +343,10 @@ public class Board {
 		int hotel = 950;
 		int cost = 180;
 		int houses = 100;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("St. James Place", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square tennessee(String name, int pos) {
+	private Square tennessee(int pos) {
 		int rent = 14;
 		int oneH = 70;
 		int twoH = 200;
@@ -355,10 +355,10 @@ public class Board {
 		int hotel = 950;
 		int cost = 180;
 		int houses = 100;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("Tennessee Avenue", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square newYork(String name, int pos) {
+	private Square newYork(int pos) {
 		int rent = 16;
 		int oneH = 80;
 		int twoH = 220;
@@ -367,10 +367,10 @@ public class Board {
 		int hotel = 1000;
 		int cost = 200;
 		int houses = 100;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("New York Avenue", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square kentucky(String name, int pos) {
+	private Square kentucky(int pos) {
 		int rent = 18;
 		int oneH = 90;
 		int twoH = 250;
@@ -379,10 +379,10 @@ public class Board {
 		int hotel = 1050;
 		int cost = 220;
 		int houses = 150;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("Kentucky Avenue", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square indiana(String name, int pos) {
+	private Square indiana(int pos) {
 		int rent = 18;
 		int oneH = 90;
 		int twoH = 250;
@@ -391,10 +391,10 @@ public class Board {
 		int hotel = 1050;
 		int cost = 220;
 		int houses = 150;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("Indiana Avenue", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square illinois(String name, int pos) {
+	private Square illinois(int pos) {
 		int rent = 20;
 		int oneH = 100;
 		int twoH = 300;
@@ -403,10 +403,10 @@ public class Board {
 		int hotel = 1100;
 		int cost = 240;
 		int houses = 150;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("Illinois Avenue", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square atlantic(String name, int pos) {
+	private Square atlantic(int pos) {
 		int rent = 22;
 		int oneH = 110;
 		int twoH = 330;
@@ -415,10 +415,10 @@ public class Board {
 		int hotel = 1150;
 		int cost = 260;
 		int houses = 150;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("Atlantic Avenue", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square ventor(String name, int pos) {
+	private Square ventor(int pos) {
 		int rent = 22;
 		int oneH = 110;
 		int twoH = 330;
@@ -427,10 +427,10 @@ public class Board {
 		int hotel = 1150;
 		int cost = 260;
 		int houses = 150;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("Ventor Avenue", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square marvin(String name, int pos) {
+	private Square marvin(int pos) {
 		int rent = 24;
 		int oneH = 120;
 		int twoH = 360;
@@ -439,10 +439,10 @@ public class Board {
 		int hotel = 1200;
 		int cost = 280;
 		int houses = 150;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("Marvin Gardens", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square pacific(String name, int pos) {
+	private Square pacific(int pos) {
 		int rent = 26;
 		int oneH = 130;
 		int twoH = 390;
@@ -451,10 +451,10 @@ public class Board {
 		int hotel = 1275;
 		int cost = 300;
 		int houses = 200;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("Pacific Avenue", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square carolina(String name, int pos) {
+	private Square carolina(int pos) {
 		int rent = 26;
 		int oneH = 130;
 		int twoH = 390;
@@ -463,10 +463,10 @@ public class Board {
 		int hotel = 1275;
 		int cost = 300;
 		int houses = 200;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("North Carolina Avenue", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square pennsylvaniaAve(String name, int pos) {
+	private Square pennsylvaniaAve(int pos) {
 		int rent = 28;
 		int oneH = 150;
 		int twoH = 450;
@@ -475,10 +475,10 @@ public class Board {
 		int hotel = 1400;
 		int cost = 320;
 		int houses = 200;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("Pennsylvania Avenue", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square park(String name, int pos) {
+	private Square park(int pos) {
 		int rent = 35;
 		int oneH = 175;
 		int twoH = 500;
@@ -487,10 +487,10 @@ public class Board {
 		int hotel = 1500;
 		int cost = 350;
 		int houses = 200;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("Park Place", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square boardwalk(String name, int pos) {
+	private Square boardwalk(int pos) {
 		int rent = 50;
 		int oneH = 200;
 		int twoH = 600;
@@ -499,11 +499,11 @@ public class Board {
 		int hotel = 2000;
 		int cost = 400;
 		int houses = 200;
-		return new Property(name, pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
+		return new Property("Boardwalk", pos, rent, oneH, twoH, threeH, fourH, hotel, cost, houses);
 	}
 
-	private Square parking(String name, int pos) {
-		return new Inactive(name, pos);
+	private Square parking(int pos) {
+		return new Inactive("Free Parking", pos);
 	}
 
 }

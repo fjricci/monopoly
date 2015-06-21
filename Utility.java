@@ -1,23 +1,15 @@
 package monopoly;
 
 public class Utility implements Square {
-	//rent multiplier, given number of utilities owned by a player
-	private final int ONE = 4;
-	private final int TWO = 10;
 	private final int COST = 150; //cost to purchase utility
 
-	private Dice dice;
-
-	private Player.PlayerType ownerType; //stores utility owner name enum
+	private final Dice dice;
+	private final String name;
+	private final int pos;
 	private Player owner;     //stores utility owner
 	private boolean owned;  //is utility owned?
-
 	private int numOwned; //number of utilities owned by a player
 	private boolean mortgaged; //is property mortgaged?
-
-	private String name;
-	private int pos;
-
 	private Utility other;
 
 	//utility constructor
@@ -56,7 +48,6 @@ public class Utility implements Square {
 	public void purchase(Player player) {
 		owned = true;
 		owner = player;
-		ownerType = player.getPlayer();
 		numOwned = 1;
 		player.properties().stream().filter(s -> s instanceof Utility).forEach(s -> numOwned++);
 	}
@@ -66,20 +57,17 @@ public class Utility implements Square {
 		if (roll == 0)
 			roll = dice.roll().val;
 
+		int TWO = 10;
 		if (owner.equals(other.owner()))
 			return TWO * roll;
 
+		int ONE = 4;
 		return ONE * roll;
 	}
 
 	//return total utilities owned by player owning this utility
 	public boolean isOwned() {
 		return owned;
-	}
-
-	//return owner name enum
-	public Player.PlayerType ownerType() {
-		return ownerType;
 	}
 
 	//return player object of owner
