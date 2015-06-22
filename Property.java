@@ -2,7 +2,6 @@ package monopoly;
 
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.stream.Collectors;
 
 public class Property implements Square {
 	//costs of rent for all possible property states
@@ -76,8 +75,10 @@ public class Property implements Square {
 		if (groupB == null)
 			b = true;
 
-		Queue<Property> props = player.properties().stream().filter(square -> square instanceof Property).map(
-				square -> (Property) square).collect(Collectors.toCollection(LinkedList::new));
+		Queue<Property> props = new LinkedList<>();
+		for (Square sq : player.properties())
+			if (sq instanceof Property)
+				props.add((Property) sq);
 
 		for (Property prop : props) {
 			if (prop.name().equals(groupA.name()))

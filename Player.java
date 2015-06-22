@@ -1,155 +1,41 @@
 package monopoly;
 
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.stream.Collectors;
+/**
+ * Created by fjricci on 6/22/2015.
+ * An interface for a monopoly player, to allow for different types of players (ie CPU vs Human)
+ */
+public interface Player {
+	void addProperty(Square square);
 
-public class Player {
-	private final int TO_JAIL = 30;
-	private final int IN_JAIL = 10;
-	private final Queue<Square> properties;
-	private final PlayerType player;
-	private final String playerName;
-	private int money;
-	private int position;
-	private boolean inJail;
-	private int jailTurn;
-	private int numJailFree;
-	private boolean chanceFree;
+	void move(int numSpaces);
 
-	public Player(PlayerType player, String playerName) {
-		money = 1500;
-		properties = new LinkedList<>();
-		position = 0;
-		this.player = player;
-		this.playerName = playerName;
-		inJail = false;
-		numJailFree = 0;
-		chanceFree = false;
-	}
+	void moveTo(int pos);
 
-	public void addProperty(Square square) {
-		if (!square.isOwnable())
-			throw new IllegalArgumentException("This property cannot be purchased!");
-		properties.add(square);
-		square.purchase(this);
-	}
+	int position();
 
-	public void move(int numSpaces) {
-		position += numSpaces;
-		int BOARD_SIZE = 40;
-		if (position >= BOARD_SIZE) {
-			position -= BOARD_SIZE;
-			excMoney(200);
-		}
+	Iterable<Square> properties();
 
-		if (position == TO_JAIL) {
-			position = IN_JAIL;
-			toJail();
-		}
-	}
+	String name();
 
-	public void moveTo(int pos) {
-		if (pos < position && !inJail)
-			excMoney(200);
-		position = pos;
+	int getMoney();
 
-		if (position == TO_JAIL) {
-			position = IN_JAIL;
-			toJail();
-		}
-	}
+	void excMoney(int money);
 
-	public int position() {
-		return position;
-	}
+	void toJail();
 
-	public Queue<Square> properties() {
-		return properties.stream().collect(Collectors.toCollection(LinkedList::new));
-	}
+	boolean stayJail();
 
-	public String name() {
-		return playerName;
-	}
+	void sellProp(Square sq);
 
-	public PlayerType getPlayer() {
-		return player;
-	}
+	void leaveJail();
 
-	public int getMoney() {
-		return money;
-	}
+	boolean inJail();
 
-	public void excMoney(int money) {
-		this.money += money;
-	}
+	void addJailFree(boolean chance);
 
-	public void toJail() {
-		inJail = true;
-		move(40);
-		jailTurn = 0;
-	}
+	boolean useJailFree();
 
-	public boolean stayJail() {
-		jailTurn++;
-		if (jailTurn == 3) {
-			inJail = false;
-			return false;
-		}
-		return true;
-	}
+	int numJailFree();
 
-	public void sellProp(Square sq) {
-		properties.remove(sq);
-	}
-
-	public void leaveJail() {
-		inJail = false;
-		moveTo(10);
-	}
-
-	public boolean inJail() {
-		return inJail;
-	}
-
-	public void addJailFree(boolean chance) {
-		numJailFree++;
-		chanceFree = chance;
-	}
-
-	public boolean useJailFree() {
-		if (numJailFree < 1)
-			throw new RuntimeException("You do not have any cards!");
-
-		numJailFree--;
-		boolean deck = chanceFree;
-		chanceFree = !chanceFree;
-		return deck;
-	}
-
-	public int numJailFree() {
-		return numJailFree;
-	}
-
-	public int getAssets() {
-		int assets = this.money;
-		for (Square s : properties) {
-			assets += s.cost();
-			if (s instanceof Property)
-				assets += getHouseVal((Property) s);
-		}
-		return assets;
-	}
-
-	private int getHouseVal(Property prop) {
-		int numHouses = prop.numHouses();
-		int houseCost = prop.houseCost();
-
-		return numHouses * houseCost;
-	}
-
-	public enum PlayerType {
-		PLAYER_A, PLAYER_B, PLAYER_C, PLAYER_D,
-		PLAYER_E, PLAYER_F, PLAYER_G, PLAYER_H, BANK
-	}
+	int getAssets();
 }

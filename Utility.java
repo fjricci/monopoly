@@ -49,7 +49,10 @@ public class Utility implements Square {
 		owned = true;
 		owner = player;
 		numOwned = 1;
-		player.properties().stream().filter(s -> s instanceof Utility).forEach(s -> numOwned++);
+
+		for (Square sq : player.properties())
+			if (sq instanceof Utility)
+				numOwned++;
 	}
 
 	//return rent on utility, given a roll

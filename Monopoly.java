@@ -12,7 +12,7 @@
  * ProbDice.java
  * Inactive.java
  * Jail.java
- * Player.java
+ * HumanPlayer.java
  * Prob.java
  * Property.java
  * Railroad.java
@@ -33,12 +33,10 @@
 package monopoly;
 
 import monopoly.Jail.JailType;
-import monopoly.Player.PlayerType;
 
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Queue;
-import java.util.stream.Collectors;
 
 class Monopoly {
 	private final boolean deterministic;
@@ -109,24 +107,31 @@ class Monopoly {
 	}
 
 	private void initialize() {
-		int N = 0;
-		System.out.println("How many players?");
-		while (N == 0) {
+		System.out.println("How many total players?");
+		int N = input.inputInt();
+		while (N < 2 || N > 8) {
+			System.out.println("Must have between 2 and 8 players. Please try again.");
 			N = input.inputInt();
-			if (N < 2 || N > 8) {
-				System.out.println("Must have between 2 and 8 players. Please try again.");
-				N = 0;
-			}
+		}
+
+		System.out.println("How many human players?");
+		int H = input.inputInt();
+		while (H < 1 || H > N) {
+			if (H < 1)
+				System.out.println("Must have at least one human player. Please try again.");
+			if (H > N)
+				System.out.println("Cannot have more human players than total players. Please try again.");
+			H = input.inputInt();
 		}
 
 		int[] order = new int[N];
-		for (int i = 0; i < N; i++) {
+		for (int i = 0; i < H; i++) {
 			System.out.println("Player " + (i + 1) + " name?");
-			String name = input.inputString();
-			Player.PlayerType type = Player.PlayerType.values()[i];
-			Player player = new Player(type, name);
-			players.add(player);
+			players.add(new HumanPlayer(input.inputString()));
 		}
+
+		for (int i = H; i < N; i++)
+			players.add(new CPUPlayer(i - H));
 
 		valueEstimator = new ValueEstimator(board, players, new ProbDice(), (Cards) board.square(7));
 
@@ -435,7 +440,7 @@ class Monopoly {
 			System.out.println("You paid $50 to get out of jail!");
 		} else {
 			int cost = JAIL_COST;
-			Player bank = new Player(PlayerType.BANK, "Bank");
+			Player bank = new CPUPlayer(-1);
 			while (true) {
 				cost = additionalFunds(cost, player, bank);
 				if (cost == Integer.MIN_VALUE)
@@ -469,7 +474,7 @@ class Monopoly {
 			if (!additional)
 				player.excMoney(-1 * cost);
 			else {
-				Player bank = new Player(PlayerType.BANK, "Bank");
+				Player bank = new CPUPlayer(-1);
 				while (true) {
 					cost = additionalFunds(cost, player, bank);
 					if (cost == Integer.MIN_VALUE)
@@ -538,7 +543,7 @@ class Monopoly {
 			cost *= 2;
 		chanceBoost = false;
 		Player owner = square.owner();
-		if (player.getPlayer() == owner.getPlayer())
+		if (player.name().equals(owner.name()))
 			return;
 		boolean additional = false;
 		System.out.println("You have landed on " + square.name() + " and owe " + cost + " in rent.");
@@ -583,7 +588,7 @@ class Monopoly {
 		if (!additional)
 			player.excMoney(-1 * cost);
 		else {
-			Player bank = new Player(PlayerType.BANK, "Bank");
+			Player bank = new CPUPlayer(-1);
 			while (true) {
 				cost = additionalFunds(cost, player, bank);
 				if (cost == Integer.MIN_VALUE)
@@ -716,7 +721,7 @@ class Monopoly {
 			player.excMoney(-1 * val);
 		else {
 			while (true) {
-				val = additionalFunds(val, player, new Player(PlayerType.BANK, "Bank"));
+				val = additionalFunds(val, player, new CPUPlayer(-1));
 				if (val == Integer.MIN_VALUE)
 					return;
 				if (val <= 0) {
@@ -795,8 +800,10 @@ class Monopoly {
 	}
 
 	private Square squareSelect(Player player, boolean mort) {
-		Queue<Square> props = player.properties().stream().filter(sq -> (sq.isMortgaged() == mort)).collect(
-				Collectors.toCollection(LinkedList::new));
+		Queue<Square> props = new LinkedList<>();
+		for (Square sq : player.properties())
+			if (sq.isMortgaged() == mort)
+				props.add(sq);
 		return propertySelect(props);
 	}
 
@@ -804,7 +811,7 @@ class Monopoly {
 		return propertySelect(player.properties());
 	}
 
-	private Square propertySelect(Queue<Square> props) {
+	private Square propertySelect(Iterable<Square> props) {
 		System.out.println("You own the following properties:");
 
 		int counter = 1;
@@ -825,10 +832,11 @@ class Monopoly {
 	}
 
 	private Queue<Square> availableAssets(Player player) {
-		Queue<Square> props = player.properties();
+		Iterable<Square> props = player.properties();
 		Queue<Square> avail = new LinkedList<>();
-		avail.addAll(props.stream().filter(sq -> !sq.isMortgaged()).collect(Collectors.toList()));
-
+		for (Square sq : props)
+			if (!sq.isMortgaged())
+				avail.add(sq);
 		return avail;
 	}
 
@@ -857,9 +865,9 @@ class Monopoly {
 	}
 
 	private void lose(Player loser, Player winner) {
-		Queue<Square> squares = loser.properties();
-		while (!squares.isEmpty())
-			winner.addProperty(squares.remove());
+		Iterable<Square> squares = loser.properties();
+		for (Square sq : squares)
+			winner.addProperty(sq);
 		winner.excMoney(loser.getMoney());
 		while (loser.numJailFree() > 0)
 			winner.addJailFree(loser.useJailFree());
@@ -877,13 +885,19 @@ class Monopoly {
 			System.out.printf("%-10s%40s%n", "Money", player.getMoney());
 			System.out.printf("%-10s%40s%n", "Position", player.position());
 			System.out.printf("%-10s", "Properties");
-			Queue<Square> owned = player.properties();
-			if (owned.isEmpty())
+			Iterable<Square> owned = player.properties();
+
+			boolean first = true;
+			for (Square s : owned) {
+				if (first)
+					System.out.printf("%40s%n", s);
+				else
+					System.out.printf("%50s%n", s);
+				first = false;
+			}
+
+			if (first)
 				System.out.printf("%40s%n", "none");
-			else
-				System.out.printf("%40s%n", owned.remove());
-			for (Square s : owned)
-				System.out.printf("%50s%n", s);
 
 			if (player.inJail())
 				System.out.println("In jail");

@@ -32,10 +32,10 @@ class ValueEstimator {
         Queue<Player> queue = new LinkedList<>();
 	    Cards chance = (Cards) board.square(7);
 
-        Player player1 = new Player(Player.PlayerType.PLAYER_B, "John");
-        Player player2 = new Player(Player.PlayerType.PLAYER_C, "Jim");
-        Player player3 = new Player(Player.PlayerType.PLAYER_D, "James");
-        Player player4 = new Player(Player.PlayerType.PLAYER_E, "Jacob");
+	    Player player1 = new HumanPlayer("John");
+	    Player player2 = new HumanPlayer("Jim");
+	    Player player3 = new HumanPlayer("James");
+	    Player player4 = new HumanPlayer("Jacob");
 
         queue.add(player1);
         queue.add(player2);
