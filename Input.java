@@ -1,6 +1,5 @@
 package monopoly;
 
-import java.util.Queue;
 import java.util.Scanner;
 
 /**
@@ -46,7 +45,7 @@ class Input {
 		}
 	}
 
-	public Player inputPlayer(Queue<Player> players, Player notAllowed) {
+	public Player inputPlayer(Iterable<Player> players, Player notAllowed) {
 		Player player = null;
 		do {
 			String name = inputString();

@@ -5,6 +5,7 @@ import java.util.Queue;
 import java.util.stream.Collectors;
 
 public class HumanPlayer implements Player {
+	private final Input input;
 	private final int TO_JAIL = 30;
 	private final int IN_JAIL = 10;
 	private final Queue<Square> properties;
@@ -17,6 +18,7 @@ public class HumanPlayer implements Player {
 	private boolean chanceFree;
 
 	public HumanPlayer(String playerName) {
+		input = new Input();
 		money = 1500;
 		properties = new LinkedList<>();
 		position = 0;
@@ -140,5 +142,21 @@ public class HumanPlayer implements Player {
 		int houseCost = prop.houseCost();
 
 		return numHouses * houseCost;
+	}
+
+	public boolean inputBool() {
+		return input.inputBool();
+	}
+
+	public int inputInt() {
+		return input.inputInt();
+	}
+
+	public int inputDecision(String[] choices) {
+		return input.inputDecision(choices);
+	}
+
+	public Player inputPlayer(Iterable<Player> players, Player notAllowed) {
+		return input.inputPlayer(players, notAllowed);
 	}
 }

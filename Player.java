@@ -4,7 +4,8 @@ package monopoly;
  * Created by fjricci on 6/22/2015.
  * An interface for a monopoly player, to allow for different types of players (ie CPU vs Human)
  */
-public interface Player {
+interface Player {
+	/* Player stuff */
 	void addProperty(Square square);
 
 	void move(int numSpaces);
@@ -38,4 +39,13 @@ public interface Player {
 	int numJailFree();
 
 	int getAssets();
+
+	/* Input stuff */
+	boolean inputBool();
+
+	int inputInt();
+
+	int inputDecision(String[] choices);
+
+	Player inputPlayer(Iterable<Player> players, Player notAllowed);
 }

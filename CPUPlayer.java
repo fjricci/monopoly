@@ -145,4 +145,21 @@ public class CPUPlayer implements Player {
 
 		return numHouses * houseCost;
 	}
+
+	//TODO input stuff
+	public boolean inputBool() {
+		return false;
+	}
+
+	public int inputInt() {
+		return 0;
+	}
+
+	public int inputDecision(String[] choices) {
+		return 0;
+	}
+
+	public Player inputPlayer(Iterable<Player> players, Player notAllowed) {
+		return notAllowed;
+	}
 }

@@ -44,7 +44,6 @@ class Monopoly {
 	private final Board board; //game board
 	private final Deck chance;
 	private final Deck community;
-	private final Input input;
 	private final Queue<Player> players;
 	private boolean chanceBoost = false;
 	private ValueEstimator valueEstimator;
@@ -52,7 +51,7 @@ class Monopoly {
 
 	private Monopoly() {
 		players = new LinkedList<>();
-		input = new Input();
+		Input input = new Input();
 
 		System.out.println("Would you like to provide your own dice and card input?");
 		deterministic = input.inputBool();
@@ -67,7 +66,7 @@ class Monopoly {
 		}
 
 		board = new Board(chance, community, deterministic); //create new board
-		initialize();
+		initialize(input);
 	}
 
 	public static void main(String[] args) {
@@ -106,7 +105,7 @@ class Monopoly {
 		System.out.println("----------------------------------------");
 	}
 
-	private void initialize() {
+	private void initialize(Input input) {
 		System.out.println("How many total players?");
 		int N = input.inputInt();
 		while (N < 2 || N > 8) {
@@ -185,9 +184,9 @@ class Monopoly {
 		while (true) {
 			if (player.inJail()) {
 				System.out.println("Would you like to get out of jail using cash or card?");
-				if (input.inputBool()) {
+				if (player.inputBool()) {
 					System.out.println("Select cash or card.");
-					int choice = input.inputDecision(new String[]{"cash", "card"});
+					int choice = player.inputDecision(new String[]{"cash", "card"});
 					if (choice == 0) {
 						player.excMoney(-50);
 						player.leaveJail();
@@ -245,7 +244,7 @@ class Monopoly {
 			System.out.println("2) Mortgage/unmortgage properties");
 			System.out.println("3) Trade with another player");
 			System.out.println("4) Nothing");
-			int decision = input.inputInt();
+			int decision = player.inputInt();
 
 			switch (decision) {
 				case 1:
@@ -323,7 +322,7 @@ class Monopoly {
 
 			System.out.println("You now own " + prop.numHouses() + " houses on " + prop.name());
 			System.out.println("Would you like to buy any more houses?");
-		} while (input.inputBool());
+		} while (player.inputBool());
 	}
 
 	private int sellHouses(Player player) {
@@ -348,18 +347,18 @@ class Monopoly {
 
 			System.out.println("You now own " + prop.numHouses() + " houses on " + prop.name());
 			System.out.println("Would you like to sell any more houses?");
-		} while (input.inputBool());
+		} while (player.inputBool());
 		player.excMoney(value);
 		return value;
 	}
 
 	private void handleHouses(Player player) {
 		System.out.println("Would you like to buy houses?");
-		if (input.inputBool())
+		if (player.inputBool())
 			buyHouses(player);
 
 		System.out.println("Would you like to sell houses?");
-		if (input.inputBool())
+		if (player.inputBool())
 			sellHouses(player);
 	}
 
@@ -376,7 +375,7 @@ class Monopoly {
 
 			player.excMoney(sq.mortgage());
 			System.out.println("Would you like to mortgage any more properties?");
-		} while (input.inputBool());
+		} while (player.inputBool());
 	}
 
 	private void unmortgage(Player player) {
@@ -385,34 +384,34 @@ class Monopoly {
 			Square sq = squareSelect(player, true);
 			player.excMoney(sq.mortgage());
 			System.out.println("Would you like to unmortgage any more properties?");
-		} while (input.inputBool());
+		} while (player.inputBool());
 	}
 
 	private void handleMortgages(Player player) {
 		System.out.println("Would you like to mortgage properties?");
-		if (input.inputBool()) {
+		if (player.inputBool()) {
 			mortgage(player);
 		}
 		System.out.println("Would you like to unmortgage properties?");
-		if (input.inputBool()) {
+		if (player.inputBool()) {
 			unmortgage(player);
 		}
 	}
 
 	private void handleTrade(Player player) {
 		System.out.println("With which player would you like to trade?");
-		Player other = input.inputPlayer(players, player);
+		Player other = player.inputPlayer(players, player);
 
 		System.out.println("Would you like to exchange money?");
-		if (input.inputBool()) {
+		if (player.inputBool()) {
 			System.out.println("Money exchange value? (Negative if you give them money)");
-			int val = input.inputInt();
+			int val = player.inputInt();
 			player.excMoney(val);
 			other.excMoney(-1 * val);
 		}
 
 		System.out.println("Would you like to give them properties?");
-		while (input.inputBool()) {
+		while (player.inputBool()) {
 			Square sq = squareSelect(player);
 			sq.purchase(other);
 			player.sellProp(sq);
@@ -421,7 +420,7 @@ class Monopoly {
 		}
 
 		System.out.println("Would they like to give you properties?");
-		while (input.inputBool()) {
+		while (player.inputBool()) {
 			Square sq = squareSelect(other);
 			sq.purchase(player);
 			other.sellProp(sq);
@@ -470,7 +469,7 @@ class Monopoly {
 			System.out.println("This transaction will require additional funds.");
 		}
 
-		if (input.inputBool()) {
+		if (player.inputBool()) {
 			if (!additional)
 				player.excMoney(-1 * cost);
 			else {
@@ -510,13 +509,13 @@ class Monopoly {
 		while (true) {
 			int minBid = currentBid + BID_INCREMENT;
 			System.out.println("Would anyone like to place a bid? Minimum bid: $" + minBid);
-			if (!input.inputBool())
+			if (!player.inputBool())
 				break;
 
 			System.out.println("Please enter player name");
-			winner = input.inputPlayer(players, player);
+			winner = player.inputPlayer(players, player);
 			System.out.println(winner.name() + ", please enter your bid.");
-			int bid = input.inputInt();
+			int bid = player.inputInt();
 			if (bid < minBid) {
 				System.out.println("Bid is below minimum bid. Please try again.");
 				continue;
@@ -572,7 +571,7 @@ class Monopoly {
 		int cost;
 		if (square.position() == 4) {
 			System.out.println("Would you like to pay 10% or 200 (10%/200)?");
-			if (input.inputDecision(new String[]{"10%", "200"}) == 0)
+			if (player.inputDecision(new String[]{"10%", "200"}) == 0)
 				cost = tax.tax(player.getAssets());
 			else
 				cost = tax.tax();
@@ -772,7 +771,7 @@ class Monopoly {
 			System.out.println("You need additional funds!");
 			System.out.println("How will you obtain necessary funds (Mortgage/Sell Houses)?");
 
-			int choice = input.inputDecision(new String[]{"Mortgage", "Sell Houses"});
+			int choice = player.inputDecision(new String[]{"Mortgage", "Sell Houses"});
 
 			if (choice == 0) {
 				System.out.println("Which property would you like to mortgage?");
@@ -796,7 +795,7 @@ class Monopoly {
 			if (!sq.isMortgaged())
 				props.add(sq);
 		}
-		return (Property) propertySelect(props);
+		return (Property) propertySelect(props, player);
 	}
 
 	private Square squareSelect(Player player, boolean mort) {
@@ -804,14 +803,14 @@ class Monopoly {
 		for (Square sq : player.properties())
 			if (sq.isMortgaged() == mort)
 				props.add(sq);
-		return propertySelect(props);
+		return propertySelect(props, player);
 	}
 
 	private Square squareSelect(Player player) {
-		return propertySelect(player.properties());
+		return propertySelect(player.properties(), player);
 	}
 
-	private Square propertySelect(Iterable<Square> props) {
+	private Square propertySelect(Iterable<Square> props, Player player) {
 		System.out.println("You own the following properties:");
 
 		int counter = 1;
@@ -819,7 +818,7 @@ class Monopoly {
 			System.out.println(counter++ + ") " + sq.name());
 
 		while (true) {
-			int propNum = input.inputInt();
+			int propNum = player.inputInt();
 			int propState = 1;
 
 			for (Square sq : props) {
