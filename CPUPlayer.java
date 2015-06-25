@@ -157,8 +157,13 @@ public class CPUPlayer implements Player {
 				return handleOutJail(state);
 			case BUY_HOUSE:
 				return handleBuyHouses(state);
+			case MORTGAGE:
+				return handleMortgage(state);
+			case UNMORTGAGE:
+				return handleUnmortgage(state);
+			default:
+				return false;
 		}
-		return false;
 	}
 
 	public int inputInt(Monopoly.State state) {
@@ -192,7 +197,6 @@ public class CPUPlayer implements Player {
 		return false;
 	}
 
-	//TODO have to have functionality for which properties are available for house purchasing - maybe a queue
 	private boolean handleBuyHouses(Monopoly.State state) {
 		Queue<Property> purchaseable = new LinkedList<>();
 		for (Square sq : properties) {
@@ -205,6 +209,19 @@ public class CPUPlayer implements Player {
 
 		for (Property p : purchaseable) {
 			if (p.houseCost() < money)
+				return true;
+		}
+
+		return false;
+	}
+
+	private boolean handleMortgage(Monopoly.State state) {
+		return false;
+	}
+
+	private boolean handleUnmortgage(Monopoly.State state) {
+		for (Square sq : state.current.properties()) {
+			if (sq.isMortgaged() && sq.mortgageCost() < money)
 				return true;
 		}
 
