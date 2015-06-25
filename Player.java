@@ -41,11 +41,11 @@ interface Player {
 	int getAssets();
 
 	/* Input stuff */
-	boolean inputBool();
+	boolean inputBool(Monopoly.State state);
 
-	int inputInt();
+	int inputInt(Monopoly.State state);
 
-	int inputDecision(String[] choices);
+	int inputDecision(Monopoly.State state, String[] choices);
 
-	Player inputPlayer(Iterable<Player> players, Player notAllowed);
+	Player inputPlayer(Monopoly.State state, Player notAllowed);
 }

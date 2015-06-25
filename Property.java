@@ -207,6 +207,9 @@ public class Property implements Square {
 	}
 
 	public boolean groupBuild() {
+		if (!monopoly)
+			return false;
+
 		int aDiff = groupA.numHouses() - numHouses();
 		boolean aOkay = aDiff == 0 || aDiff == 1;
 		if (groupB == null)

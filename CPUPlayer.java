@@ -147,19 +147,67 @@ public class CPUPlayer implements Player {
 	}
 
 	//TODO input stuff
-	public boolean inputBool() {
+	public boolean inputBool(Monopoly.State state) {
+		switch (state.state) {
+			case PURCHASE:
+				return handlePurchase(state);
+			case AUCTION:
+				return handleAuction(state);
+			case BUY_JAIL:
+				return handleOutJail(state);
+			case BUY_HOUSE:
+				return handleBuyHouses(state);
+		}
 		return false;
 	}
 
-	public int inputInt() {
+	public int inputInt(Monopoly.State state) {
 		return 0;
 	}
 
-	public int inputDecision(String[] choices) {
+	public int inputDecision(Monopoly.State state, String[] choices) {
 		return 0;
 	}
 
-	public Player inputPlayer(Iterable<Player> players, Player notAllowed) {
+	public Player inputPlayer(Monopoly.State state, Player notAllowed) {
 		return notAllowed;
+	}
+
+	//Input handlers TODO improvements
+	private boolean handlePurchase(Monopoly.State state) {
+		return true;
+	}
+
+	private boolean handleAuction(Monopoly.State state) {
+		int cost = state.board.square(state.current.position()).cost();
+		return (state.val <= 2 * cost);
+	}
+
+	private boolean handleOutJail(Monopoly.State state) {
+		//buy way out of jail if any squares are still in the bank
+		for (Square sq : state.board.getBoard()) {
+			if (sq.isOwnable() && !sq.isOwned())
+				return true;
+		}
+		return false;
+	}
+
+	//TODO have to have functionality for which properties are available for house purchasing - maybe a queue
+	private boolean handleBuyHouses(Monopoly.State state) {
+		Queue<Property> purchaseable = new LinkedList<>();
+		for (Square sq : properties) {
+			if (!(sq instanceof Property)) continue;
+
+			Property prop = (Property) sq;
+			if (prop.groupBuild())
+				purchaseable.add(prop);
+		}
+
+		for (Property p : purchaseable) {
+			if (p.houseCost() < money)
+				return true;
+		}
+
+		return false;
 	}
 }

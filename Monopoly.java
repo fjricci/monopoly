@@ -41,16 +41,17 @@ import java.util.Queue;
 class Monopoly {
 	private final boolean deterministic;
 	private final Dice dice; //two six-sided dice
-	private final Board board; //game board
 	private final Deck chance;
 	private final Deck community;
-	private final Queue<Player> players;
+	private State state;
 	private boolean chanceBoost = false;
 	private ValueEstimator valueEstimator;
 	private boolean lost = false;
-
 	private Monopoly() {
-		players = new LinkedList<>();
+		state = new State();
+		state.players = new LinkedList<>();
+		state.current = null;
+		state.state = DecisionState.NONE;
 		Input input = new Input();
 
 		System.out.println("Would you like to provide your own dice and card input?");
@@ -65,7 +66,7 @@ class Monopoly {
 			community = new RandomDeck();
 		}
 
-		board = new Board(chance, community, deterministic); //create new board
+		state.board = new Board(chance, community, deterministic); //create new board
 		initialize(input);
 	}
 
@@ -75,12 +76,12 @@ class Monopoly {
 	}
 
 	private void run() {
-		while (players.size() > 1) {
+		while (state.players.size() > 1) {
 			try {
-				Player p = players.remove();
-				turn(p);
+				state.current = state.players.remove();
+				turn();
 				if (!lost)
-					players.add(p);
+					state.players.add(state.current);
 				lost = false;
 			} catch (NoSuchElementException e) {
 				System.out.println("Early Termination initiated.");
@@ -90,7 +91,7 @@ class Monopoly {
 			}
 		}
 
-		Player winner = players.remove();
+		Player winner = state.players.remove();
 		System.out.println("----------------------------------------");
 		System.out.print("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\");
 		System.out.println("\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\");
@@ -126,13 +127,13 @@ class Monopoly {
 		int[] order = new int[N];
 		for (int i = 0; i < H; i++) {
 			System.out.println("Player " + (i + 1) + " name?");
-			players.add(new HumanPlayer(input.inputString()));
+			state.players.add(new HumanPlayer(input.inputString()));
 		}
 
 		for (int i = H; i < N; i++)
-			players.add(new CPUPlayer(i - H));
+			state.players.add(new CPUPlayer(i - H));
 
-		valueEstimator = new ValueEstimator(board, players, new ProbDice(), (Cards) board.square(7));
+		valueEstimator = new ValueEstimator(state.board, state.players, new ProbDice(), (Cards) state.board.square(7));
 
 		if (deterministic)
 			return;
@@ -173,29 +174,31 @@ class Monopoly {
 		}
 
 		for (int i = 0; i < first; i++)
-			players.add(players.remove());
+			state.players.add(state.players.remove());
 
 		printState();
 	}
 
-	private void turn(Player player) {
-		System.out.println("It's " + player.name() + "'s turn");
+	private void turn() {
+		System.out.println("It's " + state.current.name() + "'s turn");
 		int double_count = 0;
 		while (true) {
-			if (player.inJail()) {
+			if (state.current.inJail()) {
 				System.out.println("Would you like to get out of jail using cash or card?");
-				if (player.inputBool()) {
+				state.state = DecisionState.BUY_JAIL;
+				if (state.current.inputBool(state)) {
 					System.out.println("Select cash or card.");
-					int choice = player.inputDecision(new String[]{"cash", "card"});
+					state.state = DecisionState.CASH_CARD;
+					int choice = state.current.inputDecision(state, new String[]{"cash", "card"});
 					if (choice == 0) {
-						player.excMoney(-50);
-						player.leaveJail();
-					} else if (player.numJailFree() > 0) {
-						if (player.useJailFree())
+						state.current.excMoney(-50);
+						state.current.leaveJail();
+					} else if (state.current.numJailFree() > 0) {
+						if (state.current.useJailFree())
 							chance.returnOutOfJail();
 						else
 							community.returnOutOfJail();
-						player.leaveJail();
+						state.current.leaveJail();
 					} else
 						System.out.println("You don't have any cards.");
 				}
@@ -205,34 +208,34 @@ class Monopoly {
 			if (roll.is_double)
 				double_count++;
 
-			if (player.inJail()) {
+			if (state.current.inJail()) {
 				if (roll.is_double) {
-					player.leaveJail();
+					state.current.leaveJail();
 					roll.is_double = false; //we don't re-roll if the double was used to escape jail
 				} else {
 					System.out.println("You did not roll a double.");
-					if (!player.stayJail())
-						leaveJail(player);
+					if (!state.current.stayJail())
+						leaveJail(state.current);
 					else
 						break;
 				}
 			}
 
 			if (double_count == 3) {
-				toJail(player);
+				toJail(state.current);
 				break;
 			}
 
 			System.out.print("You rolled a " + roll.val);
 			if (roll.is_double)
 				System.out.print(" (double)");
-			Square[] square = board.getBoard();
-			System.out.println(" and landed on " + square[(player.position() + roll.val) % 40].name());
-			player.move(roll.val);
+			Square[] square = state.board.getBoard();
+			System.out.println(" and landed on " + square[(state.current.position() + roll.val) % 40].name());
+			state.current.move(roll.val);
 
-			handleSquare(player, square[player.position()], roll.val);
+			handleSquare(state.current, square[state.current.position()], roll.val);
 
-			if (!roll.is_double || player.inJail())
+			if (!roll.is_double || state.current.inJail())
 				break;
 		}
 
@@ -244,17 +247,18 @@ class Monopoly {
 			System.out.println("2) Mortgage/unmortgage properties");
 			System.out.println("3) Trade with another player");
 			System.out.println("4) Nothing");
-			int decision = player.inputInt();
+			state.state = DecisionState.ADDITIONAL;
+			int decision = state.current.inputInt(state);
 
 			switch (decision) {
 				case 1:
-					handleHouses(player);
+					handleHouses(state.current);
 					break;
 				case 2:
-					handleMortgages(player);
+					handleMortgages(state.current);
 					break;
 				case 3:
-					handleTrade(player);
+					handleTrade(state.current);
 					break;
 				case 4:
 					additional = false;
@@ -322,7 +326,7 @@ class Monopoly {
 
 			System.out.println("You now own " + prop.numHouses() + " houses on " + prop.name());
 			System.out.println("Would you like to buy any more houses?");
-		} while (player.inputBool());
+		} while (player.inputBool(state));
 	}
 
 	private int sellHouses(Player player) {
@@ -347,18 +351,20 @@ class Monopoly {
 
 			System.out.println("You now own " + prop.numHouses() + " houses on " + prop.name());
 			System.out.println("Would you like to sell any more houses?");
-		} while (player.inputBool());
+		} while (player.inputBool(state));
 		player.excMoney(value);
 		return value;
 	}
 
 	private void handleHouses(Player player) {
 		System.out.println("Would you like to buy houses?");
-		if (player.inputBool())
+		state.state = DecisionState.BUY_HOUSE;
+		if (player.inputBool(state))
 			buyHouses(player);
 
 		System.out.println("Would you like to sell houses?");
-		if (player.inputBool())
+		state.state = DecisionState.SELL_HOUSE;
+		if (player.inputBool(state))
 			sellHouses(player);
 	}
 
@@ -375,7 +381,7 @@ class Monopoly {
 
 			player.excMoney(sq.mortgage());
 			System.out.println("Would you like to mortgage any more properties?");
-		} while (player.inputBool());
+		} while (player.inputBool(state));
 	}
 
 	private void unmortgage(Player player) {
@@ -384,34 +390,39 @@ class Monopoly {
 			Square sq = squareSelect(player, true);
 			player.excMoney(sq.mortgage());
 			System.out.println("Would you like to unmortgage any more properties?");
-		} while (player.inputBool());
+		} while (player.inputBool(state));
 	}
 
 	private void handleMortgages(Player player) {
 		System.out.println("Would you like to mortgage properties?");
-		if (player.inputBool()) {
+		state.state = DecisionState.MORTGAGE;
+		if (player.inputBool(state)) {
 			mortgage(player);
 		}
 		System.out.println("Would you like to unmortgage properties?");
-		if (player.inputBool()) {
+		state.state = DecisionState.UNMORTGAGE;
+		if (player.inputBool(state)) {
 			unmortgage(player);
 		}
 	}
 
 	private void handleTrade(Player player) {
 		System.out.println("With which player would you like to trade?");
-		Player other = player.inputPlayer(players, player);
+		state.state = DecisionState.TRADE;
+		Player other = player.inputPlayer(state, player);
 
 		System.out.println("Would you like to exchange money?");
-		if (player.inputBool()) {
+		state.state = DecisionState.TRADE_MONEY;
+		if (player.inputBool(state)) {
 			System.out.println("Money exchange value? (Negative if you give them money)");
-			int val = player.inputInt();
+			int val = player.inputInt(state);
 			player.excMoney(val);
 			other.excMoney(-1 * val);
 		}
 
 		System.out.println("Would you like to give them properties?");
-		while (player.inputBool()) {
+		state.state = DecisionState.GIVE_PROPS;
+		while (player.inputBool(state)) {
 			Square sq = squareSelect(player);
 			sq.purchase(other);
 			player.sellProp(sq);
@@ -420,7 +431,8 @@ class Monopoly {
 		}
 
 		System.out.println("Would they like to give you properties?");
-		while (player.inputBool()) {
+		state.state = DecisionState.GET_PROPS;
+		while (player.inputBool(state)) {
 			Square sq = squareSelect(other);
 			sq.purchase(player);
 			other.sellProp(sq);
@@ -463,13 +475,13 @@ class Monopoly {
 
 		boolean additional = false;
 		System.out.println("Would you like to purchase " + square.name() + " for " + cost + " (Yes/No)?");
-
+		state.state = DecisionState.PURCHASE;
 		if (player.getMoney() < cost) {
 			additional = true;
 			System.out.println("This transaction will require additional funds.");
 		}
 
-		if (player.inputBool()) {
+		if (player.inputBool(state)) {
 			if (!additional)
 				player.excMoney(-1 * cost);
 			else {
@@ -509,13 +521,15 @@ class Monopoly {
 		while (true) {
 			int minBid = currentBid + BID_INCREMENT;
 			System.out.println("Would anyone like to place a bid? Minimum bid: $" + minBid);
-			if (!player.inputBool())
+			state.state = DecisionState.AUCTION;
+			state.val = minBid;
+			if (!player.inputBool(state))
 				break;
 
-			System.out.println("Please enter player name");
-			winner = player.inputPlayer(players, player);
+			System.out.println("Please enter player name"); //TODO has to be changed for CPU
+			winner = player.inputPlayer(state, player);
 			System.out.println(winner.name() + ", please enter your bid.");
-			int bid = player.inputInt();
+			int bid = player.inputInt(state);
 			if (bid < minBid) {
 				System.out.println("Bid is below minimum bid. Please try again.");
 				continue;
@@ -571,7 +585,8 @@ class Monopoly {
 		int cost;
 		if (square.position() == 4) {
 			System.out.println("Would you like to pay 10% or 200 (10%/200)?");
-			if (player.inputDecision(new String[]{"10%", "200"}) == 0)
+			state.state = DecisionState.INCOME_TAX;
+			if (player.inputDecision(state, new String[]{"10%", "200"}) == 0)
 				cost = tax.tax(player.getAssets());
 			else
 				cost = tax.tax();
@@ -652,22 +667,22 @@ class Monopoly {
 		if (initialPos == player.position())
 			return;
 
-		Square sq = board.square(player.position());
+		Square sq = state.board.square(player.position());
 		handleSquare(player, sq, 0);
 	}
 
 	private void railMove(Player player) {
 		int pos = player.position();
 
-		for (int i = pos; i < board.size(); i++) {
-			if (board.square(i) instanceof Railroad) {
+		for (int i = pos; i < state.board.size(); i++) {
+			if (state.board.square(i) instanceof Railroad) {
 				player.moveTo(i);
 				return;
 			}
 		}
 
 		for (int i = 0; i < pos; i++) {
-			if (board.square(i) instanceof Railroad) {
+			if (state.board.square(i) instanceof Railroad) {
 				player.moveTo(i);
 				return;
 			}
@@ -679,15 +694,15 @@ class Monopoly {
 	private void utilMove(Player player) {
 		int pos = player.position();
 
-		for (int i = pos; i < board.size(); i++) {
-			if (board.square(i) instanceof Utility) {
+		for (int i = pos; i < state.board.size(); i++) {
+			if (state.board.square(i) instanceof Utility) {
 				player.moveTo(i);
 				return;
 			}
 		}
 
 		for (int i = 0; i < pos; i++) {
-			if (board.square(i) instanceof Utility) {
+			if (state.board.square(i) instanceof Utility) {
 				player.moveTo(i);
 				return;
 			}
@@ -732,8 +747,8 @@ class Monopoly {
 	}
 
 	private void allPlayers(int value, Player player) {
-		player.excMoney(-1 * (players.size() - 1) * value);
-		players.stream().forEach(p -> p.excMoney(value));
+		player.excMoney(-1 * (state.players.size() - 1) * value);
+		state.players.stream().forEach(p -> p.excMoney(value));
 	}
 
 	private void jailInteraction(Player player, Jail jail) {
@@ -745,7 +760,7 @@ class Monopoly {
 	private void toJail(Player player) {
 		System.out.println("Go to Jail!");
 		player.moveTo(40);
-		Square[] square = board.getBoard();
+		Square[] square = state.board.getBoard();
 		Jail jail = (Jail) square[40];
 		jailInteraction(player, jail);
 	}
@@ -770,8 +785,8 @@ class Monopoly {
 		} else {
 			System.out.println("You need additional funds!");
 			System.out.println("How will you obtain necessary funds (Mortgage/Sell Houses)?");
-
-			int choice = player.inputDecision(new String[]{"Mortgage", "Sell Houses"});
+			state.state = DecisionState.FUNDS;
+			int choice = player.inputDecision(state, new String[]{"Mortgage", "Sell Houses"});
 
 			if (choice == 0) {
 				System.out.println("Which property would you like to mortgage?");
@@ -818,7 +833,7 @@ class Monopoly {
 			System.out.println(counter++ + ") " + sq.name());
 
 		while (true) {
-			int propNum = player.inputInt();
+			int propNum = player.inputInt(state);
 			int propState = 1;
 
 			for (Square sq : props) {
@@ -877,7 +892,7 @@ class Monopoly {
 
 	private void printState() {
 		int counter = 1;
-		for (Player player : players) {
+		for (Player player : state.players) {
 			System.out.println("--------------------------------------------------");
 			System.out.println("Player " + counter++);
 			System.out.printf("%-10s%40s%n", "Name", player.name());
@@ -905,5 +920,18 @@ class Monopoly {
 				System.out.println(player.numJailFree() + " out of jail free cards");
 			System.out.println("--------------------------------------------------");
 		}
+	}
+
+	public enum DecisionState {
+		NONE, BUY_JAIL, CASH_CARD, BUY_HOUSE, SELL_HOUSE, MORTGAGE, UNMORTGAGE, TRADE,
+		TRADE_MONEY, GIVE_PROPS, GET_PROPS, PURCHASE, AUCTION, INCOME_TAX, FUNDS, ADDITIONAL
+	}
+
+	public class State {
+		public DecisionState state;
+		public Queue<Player> players;
+		public Board board; //game board
+		public Player current;
+		public int val = 0;
 	}
 }

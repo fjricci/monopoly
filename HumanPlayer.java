@@ -144,19 +144,19 @@ public class HumanPlayer implements Player {
 		return numHouses * houseCost;
 	}
 
-	public boolean inputBool() {
+	public boolean inputBool(Monopoly.State state) {
 		return input.inputBool();
 	}
 
-	public int inputInt() {
+	public int inputInt(Monopoly.State state) {
 		return input.inputInt();
 	}
 
-	public int inputDecision(String[] choices) {
+	public int inputDecision(Monopoly.State state, String[] choices) {
 		return input.inputDecision(choices);
 	}
 
-	public Player inputPlayer(Iterable<Player> players, Player notAllowed) {
-		return input.inputPlayer(players, notAllowed);
+	public Player inputPlayer(Monopoly.State state, Player notAllowed) {
+		return input.inputPlayer(state.players, notAllowed);
 	}
 }
