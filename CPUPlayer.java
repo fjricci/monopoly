@@ -161,13 +161,22 @@ public class CPUPlayer implements Player {
 				return handleMortgage(state);
 			case UNMORTGAGE:
 				return handleUnmortgage(state);
+			case TRADE_MONEY:
+				return handleTradeMoney(state);
+			case GIVE_PROPS:
+				return handleGiveProps(state);
+			case GET_PROPS:
+				return handleGetProps(state);
 			default:
-				return false;
+				throw new IllegalArgumentException("Uh Oh. Forgot to implement a use case for boolean CPU!");
 		}
 	}
 
 	public int inputInt(Monopoly.State state) {
-		return 0;
+		switch (state.state) {
+			default:
+				throw new IllegalArgumentException("Uh Oh. Forgot to implement a use case for integer CPU!");
+		}
 	}
 
 	public int inputDecision(Monopoly.State state, String[] choices) {
@@ -179,6 +188,8 @@ public class CPUPlayer implements Player {
 	}
 
 	//Input handlers TODO improvements
+
+	//Boolean handlers
 	private boolean handlePurchase(Monopoly.State state) {
 		return true;
 	}
@@ -227,4 +238,24 @@ public class CPUPlayer implements Player {
 
 		return false;
 	}
+
+	private boolean handleTradeMoney(Monopoly.State state) {
+		return false;
+	}
+
+	private boolean handleGiveProps(Monopoly.State state) {
+		return false;
+	}
+
+	private boolean handleGetProps(Monopoly.State state) {
+		return false;
+	}
+
+	//Int handlers
+
+
+	//Decision handlers
+
+
+	//Player handlers
 }
